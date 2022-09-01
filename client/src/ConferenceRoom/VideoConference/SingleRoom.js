@@ -311,9 +311,9 @@ const SingleRoom = (props) => {
            if (message.yours) {
                return (
                 <div className='flex items-center py-1 mb-1 flex-row-reverse text-right pr-1 gap-y-1'>
-                <img src={userImg} alt="Main user" className='w-12 h-12 p-1 border border-slate-600 ml-1 rounded-full' />
+                <img src={userImg} alt="Main user" className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
                 <div >
-                    <h2 className='text-md font-medium text-slate-200'>{user?.displayName}</h2>
+                    {/* <h2 className='text-md font-medium text-slate-200'>{user?.displayName}</h2> */}
                     <p className='text-sm bg-slate-200 p-1 rounded'>{message.value}</p>
                 </div>
             </div>
@@ -323,9 +323,9 @@ const SingleRoom = (props) => {
    
            return (
             <div key={index} className='flex items-center py-1 mb-1 justify-start gap-y-1'>
-                   <img src={userImg} alt={user?.displayName} className='w-12 h-12 p-1 border border-slate-600 mr-1 rounded-full' />
+                   <img src={userImg} alt={user?.displayName} className='w-8 h-8 p-1 border border-slate-600 mr-1 rounded-full' />
                    <div>
-                       <h2 className='text-md font-medium text-slate-200'>{user?.displayName}</h2>
+                       {/* <h2 className='text-md font-medium text-slate-200'>{user?.displayName}</h2> */}
                        <p className='text-sm bg-slate-200 p-1 rounded'>{message.value}</p>
                    </div>
                </div>
