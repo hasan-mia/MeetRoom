@@ -87,7 +87,7 @@ const RoomHome = () => {
                 <div className="card w-12/12 lg:w-6/12 bg-cyan-700 text-primary-content ml-0">
                     <div className="card-body">
                         <div className="card-actions justify-start">
-                            <i className="fal fa-calendar-alt font-bold text-3xl bg-clock bg-transparent border border-gray-300  p-2"></i>
+                            <Link to="/conference/schedule" className="text-lg font-semibold"><i className="fal fa-calendar-alt font-bold text-3xl bg-clock bg-transparent border border-gray-300  p-2"></i></Link>
                         </div>
                         <Link to="/conference/schedule" className="text-lg font-semibold">Schedule</Link>
                         <p className='text-sm'>plan your meeting</p>
