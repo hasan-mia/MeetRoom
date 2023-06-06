@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import Chat from './Chat';
 import "./LiveChat.css";
 
-const socket = io.connect("https://meetsrooms.herokuapp.com");
+const socket = io.connect("http://localhost:8000");
 
 const LiveChat = () => {
     const [username, setUsername] = useState("");

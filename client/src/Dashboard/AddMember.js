@@ -26,7 +26,7 @@ const AddMember = () => {
                         specialty: data.specialty,
                         img: img
                     }
-                    fetch('https://meetsrooms.herokuapp.com/member', {
+                    fetch('http://localhost:8000/member', {
                         method: 'POST',
                         headers: {
                             'content-type': 'application/json',

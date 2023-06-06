@@ -9,18 +9,12 @@
     "dotenv": "^10.0.0",
     "emailjs-com": "^3.1.0",
     "express": "^4.17.1",
-    "global": "^4.4.0",
-    "node-pre-gyp": "^0.17.0",
-    "serve": "^14.0.1",
     "simple-peer": "^9.6.2",
-    "socket.io": "^4.1.2",
-    "styled-components": "^5.3.5",
-    "wrtc": "^0.4.7"
+    "socket.io": "^4.6.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "herou-postbuild": "YARN_PRODUCTION=false yarn install --prefix client && yarn run build --prefix client",
-    "postinstall": "cd ./client && yarn"
+    "start": "node index.js",
+    "server": "nodemon index.js"
   }
 }

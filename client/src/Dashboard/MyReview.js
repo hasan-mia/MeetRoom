@@ -25,7 +25,7 @@ const MyReview = () => {
             toast('Please give a valid rating')
             return
         }
-        fetch(`https://meetsrooms.herokuapp.com/review`, {
+        fetch(`http://localhost:8000/review`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'

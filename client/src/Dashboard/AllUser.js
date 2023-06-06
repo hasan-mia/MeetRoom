@@ -9,7 +9,7 @@ const AllUser = () => {
     // const [refetch, setRefetch] = useState(true)
 
     useEffect(() => {
-        fetch('https://meetsrooms.herokuapp.com/user')
+        fetch('http://localhost:8000/user')
             .then(res => res.json())
             .then(data => setUsers(data, setIsLoad(false), setRefetch(false)))
     }, [isLoad, refetch]);
