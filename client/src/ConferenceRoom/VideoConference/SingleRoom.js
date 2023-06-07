@@ -36,7 +36,7 @@ const SingleRoom = (props) => {
                document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
                
                // grabbing the room id from the url and then sending it to the socket io server
-               socketRef.current = io.connect("/");
+               socketRef.current = io.connect("https://meetroom.onrender.com");
                socketRef.current.emit("join room", roomID);
    
                // user a is joining 

@@ -11,7 +11,7 @@ const MeetingSchedule = () => {
     const { register, handleSubmit, } = useForm();
     
     const onSubmit = data => {
-        const url =`https://meet-room.vercel.app0/schedule`
+        const url =`https://meetroom.onrender.com/schedule`
         fetch(url,{
             method: 'POST',
             headers: {

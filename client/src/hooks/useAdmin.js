@@ -6,7 +6,7 @@ const useAdmin = user => {
     useEffect(() => {
         const email = user?.email;
         if (email) {
-            fetch(`https://meet-room.vercel.app0/admin/${email}`, {
+            fetch(`https://meetroom.onrender.com/admin/${email}`, {
                 method: 'GET',
                 headers: {
                     'Content-type': 'application/json',

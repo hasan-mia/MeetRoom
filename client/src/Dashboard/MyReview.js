@@ -25,7 +25,7 @@ const MyReview = () => {
             toast('Please give a valid rating')
             return
         }
-        fetch(`https://meet-room.vercel.app0/review`, {
+        fetch(`https://meetroom.onrender.com/review`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'

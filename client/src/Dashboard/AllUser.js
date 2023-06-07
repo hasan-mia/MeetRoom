@@ -9,7 +9,7 @@ const AllUser = () => {
     // const [refetch, setRefetch] = useState(true)
 
     useEffect(() => {
-        fetch('https://meet-room.vercel.app0/user')
+        fetch('https://meetroom.onrender.com/user')
             .then(res => res.json())
             .then(data => setUsers(data, setIsLoad(false), setRefetch(false)))
     }, [isLoad, refetch]);

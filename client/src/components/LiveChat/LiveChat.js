@@ -3,7 +3,7 @@ import { io } from 'socket.io-client';
 import Chat from './Chat';
 import "./LiveChat.css";
 
-const socket = io.connect("https://meet-room.vercel.app0");
+const socket = io.connect("https://meetroom.onrender.com");
 
 const LiveChat = () => {
     const [username, setUsername] = useState("");

@@ -40,7 +40,7 @@ const GroupRoom = () => {
     const roomID =  roomGroupID;
 
     useEffect(() => {
-        socketRef.current = io.connect("/");
+        socketRef.current = io.connect("https://meetroom.onrender.com");
         
          // ==========Asking for audio and video access============
         navigator.mediaDevices.getUserMedia({ audio: true, video: videoConstraints }).then(stream => {

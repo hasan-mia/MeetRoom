@@ -8,7 +8,7 @@ const ManageMember = () => {
     // const [refetch, setRefetch] = useState(true)
 
     useEffect(() => {
-        fetch('https://meet-room.vercel.app0/member')
+        fetch('https://meetroom.onrender.com/member')
             .then(res => res.json())
             .then(data => setMembers(data, setIsLoad(false), setRefetch(false)))
     }, [isLoad, refetch]);
