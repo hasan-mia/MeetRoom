@@ -26,7 +26,7 @@ const AddMember = () => {
                         specialty: data.specialty,
                         img: img
                     }
-                    fetch('http://localhost:8000/member', {
+                    fetch('https://meet-room.vercel.app0/member', {
                         method: 'POST',
                         headers: {
                             'content-type': 'application/json',

@@ -6,7 +6,7 @@ const UserRow = ({ user, index, setRefetch }) => {
 
     const { email, role } = user;
     const makeAdmin = () => {
-        fetch(`http://localhost:8000/user/admin/${email}`, {
+        fetch(`https://meet-room.vercel.app0/user/admin/${email}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -21,7 +21,7 @@ const UserRow = ({ user, index, setRefetch }) => {
             })
     }
     const handleDelete = email => {
-        fetch(`http://localhost:8000/user/${email}`, {
+        fetch(`https://meet-room.vercel.app0/user/${email}`, {
             method: 'DELETE',
         }).then(res => res.json())
             .then(data => {

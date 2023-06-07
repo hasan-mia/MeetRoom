@@ -4,7 +4,7 @@ const useSchedules = () => {
     const [schedules, setSchedules] = useState([]);
     const [isLoad, setIsLoad] = useState(true)
     useEffect(()=>{
-        fetch('http://localhost:8000/schedule')
+        fetch('https://meet-room.vercel.app0/schedule')
 			.then(res => res.json())
 			.then(data => setSchedules(data, setIsLoad(false)))
 	}, [schedules, isLoad]);

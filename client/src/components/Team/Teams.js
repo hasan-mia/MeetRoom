@@ -6,7 +6,7 @@ const Teams = () => {
 
 
     useEffect(() => {
-        fetch('http://localhost:8000/member')
+        fetch('https://meet-room.vercel.app0/member')
             .then(res => res.json())
             .then(data => setMembers(data))
     }, [])

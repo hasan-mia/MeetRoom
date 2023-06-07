@@ -5,7 +5,7 @@ const MemberRow = ({ member, index, setRefetch }) => {
     const { name, specialty, img, email } = member;
 
     const handleDelete = email => {
-        fetch(`http://localhost:8000/member/${email}`, {
+        fetch(`https://meet-room.vercel.app0/member/${email}`, {
             method: 'DELETE',
         }).then(res => res.json())
             .then(data => {
