@@ -39,7 +39,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [user] = useAuthState(auth);
-  console.log(user)
+
   return (
     <>
       {!user ? <Navbar /> : ''}

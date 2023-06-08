@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import io from "socket.io-client";
 import SingleVideo from '../../components/Video/SingleVideo';
 import SignleChat from '../../components/Chat/SignleChat';
@@ -7,13 +7,16 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import auth from '../../firebase.init';
 import userPic from "../../assets/user.jpg";
 
-const SingleRoom = (props) => {
+const SingleRoom = () => {
     const [user] = useAuthState(auth);
     const userImg = user?.photoURL ? user?.photoURL : userPic;
     const { roomID } = useParams()
     // variables for different functionalities of video call
+    const [height, setHeight] = useState(null)
+    console.log(height)
        const userVideo = useRef();
        const partnerVideo = useRef();
+       const containerVideo = useRef();
        const peerRef = useRef();
        const socketRef = useRef();
        const otherUser = useRef();
@@ -22,70 +25,10 @@ const SingleRoom = (props) => {
        const sendChannel = useRef();
        const [text, setText] = useState("");
        const [messages, setMessages] = useState([]);
-       let localStream;
-
-       useEffect(() => {
-           // ==========Asking for audio and video access============
-           navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
-               
-               // streaming the audio and video and storing the local stream
-               userVideo.current.srcObject = stream;
-               userStream.current = stream;
-               localStream = stream;
-   
-               document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
-               
-               // grabbing the room id from the url and then sending it to the socket io server
-               socketRef.current = io.connect("https://meetroom.onrender.com");
-               socketRef.current.emit("join room", roomID);
-   
-               // user a is joining 
-               socketRef.current.on('other user', userID => {
-                   callUser(userID);
-                   otherUser.current = userID;
-               });
-   
-               // user b is joining
-               socketRef.current.on("user joined", userID => {
-                   otherUser.current = userID;
-               });
-   
-               // calling the function when made an offer
-               socketRef.current.on("offer", handleRecieveCall);
-               
-               // sending the answer back to socket
-               socketRef.current.on("answer", handleAnswer);
-               
-               // joining the user after receiving offer
-               socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
-           });
-   
-       }, []);
-       
-       // calling user a ( who created the room )
-       const callUser = (userID) =>{
-           // taking the peer ID
-           peerRef.current = createPeer(userID);
-           
-           // streaming the user a stream
-           // giving access to our peer of our individual stream
-           // storing all the objects sent by the user into the senders array
-           userStream.current.getTracks().forEach(track => senders.current.push(
-                                                           peerRef.current.addTrack(track, userStream.current)));
-   
-           // creating a data channel for chatting
-           sendChannel.current = peerRef.current.createDataChannel("sendChannel");
-           sendChannel.current.onmessage = handleReceiveMessage;                                 
-       }
-   
-       // recieving the messages from the peer
-       const handleReceiveMessage = (e) =>{
-           setMessages(messages => [...messages, {yours: false, value: e.data }]);
-       }
-   
-       // user id of the person we are trying to call ( user b )
+    
+// user id of the person we are trying to call ( user b )
        // user b recieving the offer
-       const createPeer = (userID) =>{
+       const createPeer = useCallback( (userID) =>{
            const peer = new RTCPeerConnection({
                // connecting the two servers
                iceServers: [
@@ -96,7 +39,7 @@ const SingleRoom = (props) => {
                    { urls: 'stun:stun4.l.google.com:19302' },
                    { urls: "stun:openrelay.metered.ca:80" },
                    {
-                       urls: 'turn:numb.viagenie.ca',
+                       urls: 'turn:numb.viagenie.ca',socketRef,
                        credential: 'muazkh',
                        username: 'webrtc@live.com'
                    },
@@ -128,31 +71,26 @@ const SingleRoom = (props) => {
            peer.onnegotiationneeded = () => handleNegotiationNeededEvent(userID);
    
            return peer;
-       }
+       },[])
+
+              // calling user a ( who created the room )
+       const callUser = useCallback( (userID) =>{
+           // taking the peer ID
+           peerRef.current = createPeer(userID);
+           
+           // streaming the user a stream
+           // giving access to our peer of our individual stream
+           // storing all the objects sent by the user into the senders array
+           userStream?.current?.getTracks().forEach(track => senders.current.push(
+                                                           peerRef.current.addTrack(track, userStream.current)));
    
-       // ================== CREATING THE PEER TO PEER CONNECTION ==========
-   
-       // making the call
-       // when the actual offer is created, it is then sent to the other user
-       const handleNegotiationNeededEvent = (userID) =>{
-           peerRef.current.createOffer().then(offer => {
-               
-               // setting the local description from the users offer
-               return peerRef.current.setLocalDescription(offer);
-           }).then(() => {
-               
-               // the person we are trying to make the offer to
-               const payload = {
-                   target: userID,
-                   caller: socketRef.current.id,
-                   sdp: peerRef.current.localDescription
-               };
-               socketRef.current.emit("offer", payload);
-           }).catch(e => console.log(e));
-       }
-   
+           // creating a data channel for chatting
+           sendChannel.current = peerRef.current.createDataChannel("sendChannel");
+           sendChannel.current.onmessage = handleReceiveMessage;                                 
+       },[createPeer])
+
        // recieving the call
-       const handleRecieveCall =(incoming)=> {
+       const handleRecieveCall = useCallback( (incoming)=> {
            peerRef.current = createPeer();
    
            // chatting
@@ -185,6 +123,73 @@ const SingleRoom = (props) => {
                }
                socketRef.current.emit("answer", payload);
            })
+       },[createPeer])
+   
+
+       useEffect(() => {
+           // ==========Asking for audio and video access============
+           navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
+              setHeight( containerVideo.current.clientHeight)
+               // streaming the audio and video and storing the local stream
+               userVideo.current.srcObject = stream;
+               userStream.current = stream;
+   
+               document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
+               
+               // grabbing the room id from the url and then sending it to the socket io server
+               socketRef.current = io.connect("https://meetroom.onrender.com");
+               socketRef.current.emit("join room", roomID);
+   
+               // user a is joining 
+               socketRef.current.on('other user', userID => {
+                   callUser(userID);
+                   otherUser.current = userID;
+               });
+   
+               // user b is joining
+               socketRef.current.on("user joined", userID => {
+                   otherUser.current = userID;
+               });
+   
+               // calling the function when made an offer
+               socketRef.current.on("offer", handleRecieveCall);
+               
+               // sending the answer back to socket
+               socketRef.current.on("answer", handleAnswer);
+               
+               // joining the user after receiving offer
+               socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
+           });
+   
+       }, [callUser, handleRecieveCall, roomID]);
+       
+
+   
+       // recieving the messages from the peer
+       const handleReceiveMessage = (e) =>{
+           setMessages(messages => [...messages, {yours: false, value: e.data }]);
+       }
+   
+       
+       // ================== CREATING THE PEER TO PEER CONNECTION ==========
+   
+       // making the call
+       // when the actual offer is created, it is then sent to the other user
+       const handleNegotiationNeededEvent = (userID) =>{
+           peerRef.current.createOffer().then(offer => {
+               
+               // setting the local description from the users offer
+               return peerRef.current.setLocalDescription(offer);
+           }).then(() => {
+               
+               // the person we are trying to make the offer to
+               const payload = {
+                   target: userID,
+                   caller: socketRef.current.id,
+                   sdp: peerRef.current.localDescription
+               };
+               socketRef.current.emit("offer", payload);
+           }).catch(e => console.log(e));
        }
    
        // function to handle the answer which the user a (who created the call) is receiving
@@ -311,24 +316,32 @@ const SingleRoom = (props) => {
            if (message.yours) {
                return (
                 <div className='flex items-center py-1 mb-1 flex-row-reverse text-right pr-1 gap-y-1'>
-                <img src={userImg} alt="Main user" className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
-                <div >
-                    {/* <h2 className='text-md font-medium text-slate-200'>{user?.displayName}</h2> */}
-                    <p className='text-sm bg-slate-200 p-1 rounded'>{message.value}</p>
+                    <div className="grid">
+                        <div className="flex items-center">
+                            <p className='text-sm text-white p-1 rounded font-semibold'>{user?.displayName}</p>
+                            <img src={userImg} alt={user?.displayName} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
+                        </div>
+                        <div >
+                            <p className='text-md text-white p-1 rounded'>{message.value}</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
                    
                )
            }
    
            return (
             <div key={index} className='flex items-center py-1 mb-1 justify-start gap-y-1'>
-                   <img src={userImg} alt={user?.displayName} className='w-8 h-8 p-1 border border-slate-600 mr-1 rounded-full' />
-                   <div>
-                       {/* <h2 className='text-md font-medium text-slate-200'>{user?.displayName}</h2> */}
-                       <p className='text-sm bg-slate-200 p-1 rounded'>{message.value}</p>
+                   <div className="grid">
+                        <div className="flex items-center">
+                            <img src={userImg} alt={user?.displayName} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
+                            <p className='text-sm text-white p-1 rounded font-semibold'>{user?.displayName}</p>
+                        </div>
+                        <div>
+                            <p className='text-md bg-slate-200 p-1 rounded'>{message.value}</p>
+                        </div>
                    </div>
-               </div>
+            </div>
            )
        }
    
@@ -336,15 +349,17 @@ const SingleRoom = (props) => {
         <div className="flex justify-center gap-1 flex-col lg:flex-row">
             <div className="md:w-12/12 lg:w-8/12">
                 <SingleVideo 
-                userVideo={userVideo}
-                partnerVideo={partnerVideo}
-                getUrl={getUrl}
-                copySuccess={copySuccess}
-                hangUp={hangUp}
-                toggleAudio={toggleAudio}
-                toggleVideo={toggleVideo}
-                shareScreen={shareScreen}
-                stopShare={stopShare}
+                    height={height}
+                    containerVideo={containerVideo}
+                    userVideo={userVideo}
+                    partnerVideo={partnerVideo}
+                    getUrl={getUrl}
+                    copySuccess={copySuccess}
+                    hangUp={hangUp}
+                    toggleAudio={toggleAudio}
+                    toggleVideo={toggleVideo}
+                    shareScreen={shareScreen}
+                    stopShare={stopShare}
                 />
             </div>
 

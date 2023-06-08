@@ -3,7 +3,7 @@ import { AiOutlinePushpin } from "react-icons/ai";
 import { FaCreativeCommons } from "react-icons/fa";
 import { BsRecordCircle } from "react-icons/bs";
 
-const SingleVideo = ({userVideo, partnerVideo, getUrl, copySuccess, toggleAudio, toggleVideo, hangUp, shareScreen, stopShare}) => {
+const SingleVideo = ({height, containerVideo, userVideo, partnerVideo, getUrl, copySuccess, toggleAudio, toggleVideo, hangUp, shareScreen, stopShare}) => {
 
     return (
         <div className='w-full mx-auto'>
@@ -25,9 +25,9 @@ const SingleVideo = ({userVideo, partnerVideo, getUrl, copySuccess, toggleAudio,
                 </div>
                 
                 {/* =======Video Player======= */}
-                    <div className="grid grid-cols-1 gap-2 justify-center rounded-xl p-2 relative">
+                    <div className="grid grid-cols-1 gap-2 justify-center rounded-xl p-2 relative" ref={containerVideo}>
                         <video id="user" className="oneVideo absolute left-0 top-0" muted autoPlay playsInline ref = {userVideo} />
-                        <video id="peer" className="oneVideo relative" autoPlay playsInline ref = {partnerVideo} />
+                        <video id="peer" className="oneVideo relative" autoPlay playsInline ref = {partnerVideo} style={{height : `${height}px`}}/>
                     </div>               
                 
 
