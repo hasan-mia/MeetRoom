@@ -9,17 +9,21 @@ import userPic from "../../assets/user.jpg";
 
 const SingleRoom = () => {
     const [user] = useAuthState(auth);
-    const userImg = user?.photoURL ? user?.photoURL : userPic;
-    const { roomID } = useParams()
+    const userImg = user?.photoURL ? user?.photoURL : `${window.location.hostname}/${userPic}`;
+    const userName = user?.displayName;
+    const { roomID } = useParams();
     // variables for different functionalities of video call
     const [height, setHeight] = useState(null)
-    console.log(height)
        const userVideo = useRef();
        const partnerVideo = useRef();
        const containerVideo = useRef();
        const peerRef = useRef();
        const socketRef = useRef();
-       const otherUser = useRef();
+       const usersID = useRef();
+       const yourNameRef = useRef();
+       const yourImageRef = useRef();
+       const userNameRef = useRef();
+       const userImageRef = useRef();
        const userStream = useRef();
        const senders = useRef([]);
        const sendChannel = useRef();
@@ -81,11 +85,11 @@ const SingleRoom = () => {
            // streaming the user a stream
            // giving access to our peer of our individual stream
            // storing all the objects sent by the user into the senders array
-           userStream?.current?.getTracks().forEach(track => senders.current.push(
-                                                           peerRef.current.addTrack(track, userStream.current)));
+           userStream?.current?.getTracks().forEach(track => senders?.current?.push(
+                                                           peerRef?.current?.addTrack(track, userStream.current)));
    
            // creating a data channel for chatting
-           sendChannel.current = peerRef.current.createDataChannel("sendChannel");
+           sendChannel.current = peerRef?.current?.createDataChannel("sendChannel");
            sendChannel.current.onmessage = handleReceiveMessage;                                 
        },[createPeer])
 
@@ -95,7 +99,7 @@ const SingleRoom = () => {
    
            // chatting
            peerRef.current.ondatachannel = (event) => {
-               sendChannel.current = event.channel;
+               sendChannel.current = event?.channel;
                sendChannel.current.onmessage = handleReceiveMessage;
            };
            
@@ -104,15 +108,15 @@ const SingleRoom = () => {
            
            // setting remote description and attaching the stream
            peerRef.current.setRemoteDescription(desc).then(() => {
-               userStream.current.getTracks().forEach(track => peerRef.current.addTrack(track, userStream.current));
+               userStream.current.getTracks().forEach(track => peerRef?.current?.addTrack(track, userStream.current));
            }).then(() => {
            
                // creating the answer
-               return peerRef.current.createAnswer();
+               return peerRef?.current?.createAnswer();
            }).then(answer => {
            
                // setting local description
-               return peerRef.current.setLocalDescription(answer);
+               return peerRef?.current?.setLocalDescription(answer);
            }).then(() => {
    
                // sending data back to the caller
@@ -128,40 +132,47 @@ const SingleRoom = () => {
 
        useEffect(() => {
            // ==========Asking for audio and video access============
-           navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
-              setHeight( containerVideo.current.clientHeight)
-               // streaming the audio and video and storing the local stream
-               userVideo.current.srcObject = stream;
-               userStream.current = stream;
-   
-               document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
-               
-               // grabbing the room id from the url and then sending it to the socket io server
-               socketRef.current = io.connect("https://meetroom.onrender.com");
-               socketRef.current.emit("join room", roomID);
-   
-               // user a is joining 
-               socketRef.current.on('other user', userID => {
-                   callUser(userID);
-                   otherUser.current = userID;
+           if (roomID && user) {
+               navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
+                  setHeight( containerVideo.current.clientWidth -500)
+                   // streaming the audio and video and storing the local stream
+                   userVideo.current.srcObject = stream;
+                   userStream.current = stream;
+       
+                   document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
+                   
+                   // grabbing the room id from the url and then sending it to the socket io server
+                   socketRef.current = io.connect("https://meetroom.onrender.com");
+                   socketRef.current.emit("join room", {roomID, userName, userImg});
+       
+                   // user a is joining 
+                   socketRef.current.on('old user', ({userId, userName, userImg}) => {
+                       callUser(userId);
+                       usersID.current = userId;
+                       yourNameRef.current =userName;
+                       yourImageRef.current =userImg;
+                   });
+       
+                   // user b is joining
+                   socketRef.current.on("new user", ({newUserId, userName, userImg}) => {
+                       usersID.current = newUserId;
+                       userNameRef.current =userName;
+                       userImageRef.current =userImg;
+                   });
+       
+                   // calling the function when made an offer
+                   socketRef.current.on("offer", handleRecieveCall);
+                   
+                   // sending the answer back to socket
+                   socketRef.current.on("answer", handleAnswer);
+                   
+                   // joining the user after receiving offer
+                   socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
                });
+            
+           }
    
-               // user b is joining
-               socketRef.current.on("user joined", userID => {
-                   otherUser.current = userID;
-               });
-   
-               // calling the function when made an offer
-               socketRef.current.on("offer", handleRecieveCall);
-               
-               // sending the answer back to socket
-               socketRef.current.on("answer", handleAnswer);
-               
-               // joining the user after receiving offer
-               socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
-           });
-   
-       }, [callUser, handleRecieveCall, roomID]);
+       }, [user, callUser, handleRecieveCall, userName, roomID, userImg]);
        
 
    
@@ -200,12 +211,11 @@ const SingleRoom = () => {
    
        // ======== END OF THE PEER TO PEER CONNECTION ===============
    
-   
        // handling the ice candidates
        const handleICECandidateEvent = (e) =>{
            if (e.candidate) {
                const payload = {
-                   target: otherUser.current,
+                   target: usersID.current,
                    candidate: e.candidate,
                }
                socketRef.current.emit("ice-candidate", payload);
@@ -315,14 +325,14 @@ const SingleRoom = () => {
        const renderMessage =(message, index) => {
            if (message.yours) {
                return (
-                <div className='flex items-center py-1 mb-1 flex-row-reverse text-right pr-1 gap-y-1'>
+                <div className='flex justify-start items-center py-1 mb-1 flex-row-reverse text-right pr-1 gap-y-1'>
                     <div className="grid">
                         <div className="flex items-center">
-                            <p className='text-sm text-white p-1 rounded font-semibold'>{user?.displayName}</p>
-                            <img src={userImg} alt={user?.displayName} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
+                            <p className='text-sm text-white p-1 rounded font-semibold'>{yourNameRef?.current || "Unknown"}</p>
+                            <img src={yourImageRef?.current} alt={yourNameRef?.current} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
                         </div>
                         <div >
-                            <p className='text-md text-white p-1 rounded'>{message.value}</p>
+                            <p className='text-md bg-slate-200 p-1 rounded'>{message.value}</p>
                         </div>
                     </div>
                 </div>
@@ -334,8 +344,8 @@ const SingleRoom = () => {
             <div key={index} className='flex items-center py-1 mb-1 justify-start gap-y-1'>
                    <div className="grid">
                         <div className="flex items-center">
-                            <img src={userImg} alt={user?.displayName} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
-                            <p className='text-sm text-white p-1 rounded font-semibold'>{user?.displayName}</p>
+                            <img src={userNameRef?.current} alt={userNameRef?.current} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
+                            <p className='text-sm text-white p-1 rounded font-semibold'>{userNameRef?.current || "Unknown"}</p>
                         </div>
                         <div>
                             <p className='text-md bg-slate-200 p-1 rounded'>{message.value}</p>
@@ -347,7 +357,7 @@ const SingleRoom = () => {
    
     return (
         <div className="flex justify-center gap-1 flex-col lg:flex-row">
-            <div className="md:w-12/12 lg:w-8/12">
+            <div className="md:w-12/12 lg:w-7/12">
                 <SingleVideo 
                     height={height}
                     containerVideo={containerVideo}
@@ -366,7 +376,7 @@ const SingleRoom = () => {
             {/* ========Right Sidebar ========*/}
             <div className="md:w-12/12 lg:w-4/12">
                 {/* ========Single Chat Options ========*/}
-                <div className='pl-0 lg:pl-2'>
+                <div className='pl-0 lg:pl-2' style={{height: '90vh'}}>
                     <h2 className='text-md lg:text-xl text-center uppercase font-semibold p-2 border border-green-700 rounded-md text-gray-400'>Live Chat</h2>
                     <SignleChat
                         text={text}

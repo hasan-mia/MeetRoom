@@ -27,7 +27,7 @@ const SingleVideo = ({height, containerVideo, userVideo, partnerVideo, getUrl, c
                 {/* =======Video Player======= */}
                     <div className="grid grid-cols-1 gap-2 justify-center rounded-xl p-2 relative" ref={containerVideo}>
                         <video id="user" className="oneVideo absolute left-0 top-0" muted autoPlay playsInline ref = {userVideo} />
-                        <video id="peer" className="oneVideo relative" autoPlay playsInline ref = {partnerVideo} style={{height : `${height}px`}}/>
+                        <video id="peer" className="oneVideo relative" autoPlay playsInline ref = {partnerVideo} style={{width : `${height}px`}}/>
                     </div>               
                 
 

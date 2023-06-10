@@ -6,7 +6,7 @@ const UserRow = ({ user, index, setRefetch }) => {
 
     const { email, role } = user;
     const makeAdmin = () => {
-        fetch(`https://meetroom.onrender.com/user/admin/${email}`, {
+        fetch(`https://meetroom-server.onrender.com/user/admin/${email}`, {
             method: 'PUT',
             headers: {
                 'Content-type': 'application/json'
@@ -21,7 +21,7 @@ const UserRow = ({ user, index, setRefetch }) => {
             })
     }
     const handleDelete = email => {
-        fetch(`https://meetroom.onrender.com/user/${email}`, {
+        fetch(`https://meetroom-server.onrender.com/user/${email}`, {
             method: 'DELETE',
         }).then(res => res.json())
             .then(data => {

@@ -5,7 +5,7 @@ const MemberRow = ({ member, index, setRefetch }) => {
     const { name, specialty, img, email } = member;
 
     const handleDelete = email => {
-        fetch(`https://meetroom.onrender.com/member/${email}`, {
+        fetch(`https://meetroom-server.onrender.com/member/${email}`, {
             method: 'DELETE',
         }).then(res => res.json())
             .then(data => {

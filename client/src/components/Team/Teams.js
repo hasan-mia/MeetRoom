@@ -6,7 +6,7 @@ const Teams = () => {
 
 
     useEffect(() => {
-        fetch('https://meetroom.onrender.com/member')
+        fetch('https://meetroom-server.onrender.com/member')
             .then(res => res.json())
             .then(data => setMembers(data))
     }, [])

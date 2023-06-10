@@ -26,7 +26,7 @@ const AddMember = () => {
                         specialty: data.specialty,
                         img: img
                     }
-                    fetch('https://meetroom.onrender.com/member', {
+                    fetch('https://meetroom-server.onrender.com/member', {
                         method: 'POST',
                         headers: {
                             'content-type': 'application/json',

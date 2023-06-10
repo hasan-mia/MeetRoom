@@ -65,12 +65,10 @@ function App() {
         {/* ================VideoConference Room Route =================*/}
         <Route path="/conference" element={<RequireAuth><ConferenceRoom /></RequireAuth>}>
           <Route index element={<HomeConference />}></Route>
-          <Route path="users" element={<UserConference />}></Route>
-          
-          <Route path="room/:id" element={<SingleRoom />}></Route>
+          <Route path="/conference/users" element={<UserConference />}></Route>
           
           {/* single room */}
-          <Route path="room/:roomID" element={<SingleRoom/>} />
+          <Route path="/conference/room/:roomID" element={<SingleRoom/>} />
           {/* group room */}
           <Route path="roomGroup/:roomGroupID" element={<GroupRoom/>} />
           {/* live broadcast */}

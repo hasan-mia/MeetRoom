@@ -11,7 +11,7 @@ const MeetingSchedule = () => {
     const { register, handleSubmit, } = useForm();
     
     const onSubmit = data => {
-        const url =`https://meetroom.onrender.com/schedule`
+        const url =`https://meetroom-server.onrender.com/schedule`
         fetch(url,{
             method: 'POST',
             headers: {

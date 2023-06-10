@@ -8,10 +8,10 @@ const CreateSingleRoom = () => {
     const {setId} = useRoom()
     // creating a room id
     // redirecting the user to the correct page
-    const singleRoom = useNavigate();
+    const navigate = useNavigate();
     const create =()=> {
         const id = uuid();
-       singleRoom(`/conference/room/${id}`);
+       navigate(`/conference/room/${id}`, {replace: true});
        setId(id)
     }
 

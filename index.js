@@ -26,27 +26,31 @@ const rooms = {};
 const users = {};
 const socketToRoom = {};
 
-// when the user is forming a connection with socket.io
 io.on("connection", socket => {
 
+    const socketId = socket.id;
     // ===========Handling one on one video call=============
-    socket.on("join room", roomID => {
 
+    socket.on("join room", ({roomID, userName, userImg}) => {
         // if the room is already created, that means a person has already joined the room
         // then take the new user and push them into the same room
         // else create a new room
-        if (rooms[roomID]) {
-            rooms[roomID].push(socket.id);
-        } else {
-            rooms[roomID] = [socket.id];
+        if(rooms[roomID] === undefined){
+            rooms[roomID] = [{ id: socketId, userName, userImg }];
         }
-
-        // finding otherUSer - see if id is of the other user
-        const otherUser = rooms[roomID].find(id => id !== socket.id);
-        // if someone has joined then we get the id of the other user
-        if (otherUser) {
-            socket.emit("other user", otherUser);
-            socket.to(otherUser).emit("user joined", socket.id);
+       if(rooms[roomID] !== undefined) {
+            const existingUser = rooms[roomID]?.find(user => user.id === socketId) 
+            if (!existingUser) {
+                rooms[roomID].push({ id: socketId, userName, userImg });
+            }
+        }
+        
+        // finding the user - see if id is of the user in room exist
+        const user = rooms[roomID].find(user => user.id !== socketId);
+        if (user) {
+            socket.emit("old user", {userId: user.id, userName, userImg});
+            // if someone new user has joined then we get the id of the other user
+            socket.to(user.id).emit("new user", {newUserId: socketId, userName, userImg});
         }
 
     });
@@ -100,8 +104,8 @@ io.on("connection", socket => {
 
     // handling user disconnect in group call
     socket.on('disconnect', () => {
-
-        // getting the room array with all the participants
+       
+        // getting the group room array with all the participants
         const roomID = socketToRoom[socket.id];
         let room = users[roomID];
 

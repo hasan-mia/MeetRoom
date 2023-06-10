@@ -10,7 +10,7 @@ const AllUser = () => {
 
     useEffect(() => {
         if (users?.length <=0) {
-            fetch('https://meetroom.onrender.com/user')
+            fetch('https://meetroom-server.onrender.com/user')
             .then(res => res.json())
             .then(data => setUsers(data))
         }
