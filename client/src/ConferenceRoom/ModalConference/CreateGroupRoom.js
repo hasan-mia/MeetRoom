@@ -1,15 +1,17 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { v1 as uuid } from "uuid";
+import useRoom from '../../hooks/useRoom';
 
-const CreateGroupRoom = (props) => {
-    
+const CreateGroupRoom = () => {
+    const {setId} = useRoom()
     // creating a room id
     // redirecting the user to the correct page
     const groupRoom = useNavigate();
     const create = ()=> {
         const id = uuid();
         groupRoom(`/conference/roomGroup/${id}`);
+        setId(id)
     }
 
     // // creating a room id for scheduling a call

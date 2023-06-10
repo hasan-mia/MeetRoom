@@ -4,15 +4,18 @@ import UserRow from './UserRow';
 
 const AllUser = () => {
     const [users, setUsers] = useState([]);
-    const [isLoad, setIsLoad] = useState(true)
-    const [refetch, setRefetch] = useState(true)
+    // const [isLoad, setIsLoad] = useState(true)
     // const [refetch, setRefetch] = useState(true)
+    const [refetch, setRefetch] = useState(true)
 
     useEffect(() => {
-        fetch('https://meetroom.onrender.com/user')
+        if (users?.length <=0) {
+            fetch('https://meetroom.onrender.com/user')
             .then(res => res.json())
-            .then(data => setUsers(data, setIsLoad(false), setRefetch(false)))
-    }, [isLoad, refetch]);
+            .then(data => setUsers(data))
+        }
+        
+    }, [users]);
     return (
         <div className='pt-0'>
             <h2 className='text-center py-2 my-4 text-gray-200 bg-green-600 font-semibold text-xl'>All user: <span className='text-green-900 bg-gray-100 p-2 m-2 rounded-full'>{users.length}</span></h2>
@@ -29,7 +32,7 @@ const AllUser = () => {
                     </thead>
                     <tbody>
                         {
-                            users.map((user, index) => <UserRow
+                            users?.map((user, index) => <UserRow
                                 key={user._id}
                                 user={user}
                                 index={index}

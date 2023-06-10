@@ -25,7 +25,7 @@ const UserRow = ({ user, index, setRefetch }) => {
             method: 'DELETE',
         }).then(res => res.json())
             .then(data => {
-                console.log(data);
+                
                 if (data.deletedCount) {
                     toast.success(`Deleted `);
                     setRefetch()

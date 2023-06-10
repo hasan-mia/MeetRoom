@@ -1,6 +1,7 @@
 /* ------ IMPORTING FILES ------- */
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
@@ -11,14 +12,15 @@ const io = socket(server, {
     methods: ["GET", "POST"],
   },
 });
-const { MongoClient, ServerApiVersion } = require('mongodb');
-
+app.use(cors());
 const bodyParser = require('body-parser');
-// let senderStream;
-
+app.use(express.json());
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+const { MongoClient, ServerApiVersion } = require('mongodb');
+
+// let senderStream;
 
 /* =========== CREATING AND JOINING ROOMS FOR CONNECTION BETWEEN USERS =========*/
 // room object to store the created room IDs

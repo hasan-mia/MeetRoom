@@ -1,36 +1,39 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { v1 as uuid } from "uuid";
-import emailjs from 'emailjs-com';
+import useRoom from '../../hooks/useRoom';
+// import emailjs from 'emailjs-com';
 
-const CreateSingleRoom = (props) => {
+const CreateSingleRoom = () => {
+    const {setId} = useRoom()
     // creating a room id
     // redirecting the user to the correct page
     const singleRoom = useNavigate();
     const create =()=> {
         const id = uuid();
        singleRoom(`/conference/room/${id}`);
+       setId(id)
     }
 
-    // creating a room id for scheduling a call
-    const scheduleID =()=> {
-        const id = uuid();
-        var url = window.location.href;
-        var n = url.lastIndexOf('CreateRoom');
-        return url.substring(0, n - 1) + `/room/${id}`;
-    }
+    // // creating a room id for scheduling a call
+    // const scheduleID =()=> {
+    //     const id = uuid();
+    //     var url = window.location.href;
+    //     var n = url.lastIndexOf('CreateRoom');
+    //     return url.substring(0, n - 1) + `/room/${id}`;
+    // }
     
-    //sending an email to the user
-    const sendEmail = (e)=> {
-        e.preventDefault();
+    // //sending an email to the user
+    // const sendEmail = (e)=> {
+    //     e.preventDefault();
 
-        emailjs.sendForm('gmail', 'template_kgfrx5w', e.target, 'user_nAYJJym0KTqRP8NWdzKqS')
-            .then((result) => {
-                window.location.reload()
-            }, (error) => {
-                console.log(error.text);
-            });
-    }
+    //     emailjs.sendForm('gmail', 'template_kgfrx5w', e.target, 'user_nAYJJym0KTqRP8NWdzKqS')
+    //         .then((result) => {
+    //             window.location.reload()
+    //         }, (error) => {
+    //             console.log(error.text);
+    //         });
+    // }
    
        // <!-- Put this part before </body> tag -->
     <div className="px-2">

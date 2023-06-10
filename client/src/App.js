@@ -45,14 +45,7 @@ function App() {
       {!user ? <Navbar /> : ''}
 
       <Routes>
-        {/* ================Indivisual Route =================*/}
-        <Route path="/hasan" element={<Hasan />}> </Route>
-        <Route path="/roctim" element={<Roctim />}> </Route>
-        <Route path="/alamin" element={<Alamin />}> </Route>
-        <Route path="/hossain" element={<Hossain />}> </Route>
-        <Route path="/ariful" element={<Ariful />}> </Route>
-        <Route path="/nibras" element={<Nibras />}> </Route>
-
+      
         {/* ================Website Route =================*/}
         <Route path="/" element={<Home />}> </Route>
         <Route path="/signIn" element={<SignIn />}> </Route>
@@ -74,7 +67,7 @@ function App() {
           <Route index element={<HomeConference />}></Route>
           <Route path="users" element={<UserConference />}></Route>
           
-          <Route path="video" element={<SingleRoom />}></Route>
+          <Route path="room/:id" element={<SingleRoom />}></Route>
           
           {/* single room */}
           <Route path="room/:roomID" element={<SingleRoom/>} />
