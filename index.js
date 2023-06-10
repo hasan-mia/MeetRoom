@@ -1,7 +1,6 @@
 /* ------ IMPORTING FILES ------- */
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
@@ -12,15 +11,14 @@ const io = socket(server, {
     methods: ["GET", "POST"],
   },
 });
-app.use(cors());
+const path = require("path");
+
 const bodyParser = require('body-parser');
-app.use(express.json());
+// let senderStream;
+
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-const { MongoClient, ServerApiVersion } = require('mongodb');
-
-// let senderStream;
 
 /* =========== CREATING AND JOINING ROOMS FOR CONNECTION BETWEEN USERS =========*/
 // room object to store the created room IDs
@@ -226,122 +224,15 @@ io.on("connection", socket => {
 //     senderStream = e.streams[0];
 // }
 
-// if (process.env.NODE_ENV == 'production') {
-//     app.use(express.static('client/build'));
-//     const path = require("path");
-//     app.get('*', (req, res) => {
-//         res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-//     });
-// }
-
-// =============================
-//          MongoDB           //
-//==============================
-
-const uri = "mongodb+srv://meetroom:meetroom12345@cluster0.cgs9b.mongodb.net/?retryWrites=true&w=majority";
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-
-// ======Main Function ========
-async function run() {
-  try {
-    client.connect();
-    console.log('Connected Successfuly');
-    const scheduleCollection = client.db('MeetRoom').collection('meeting-slots');
-    const userCollection = client.db('MeetRoom').collection('users');
-    const memberCollection = client.db('MeetRoom').collection('members');
-    const reviewCollection = client.db('MeetRoom').collection('reviews');
-    // schedule Section
-    app.post('/schedule', async (req, res) => {
-      const newProduct = req.body;
-      const result = await scheduleCollection.insertOne(newProduct);
-      res.send(result);
+if (process.env.NODE_ENV == 'production') {
+    app.use(express.static('client/build'));
+    const path = require("path");
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
     });
-    app.get('/schedule', async (req, res) => {
-      const query = {};
-      const cursor = scheduleCollection.find(query);
-      const products = await cursor.toArray();
-      res.send(products)
-    });
-    app.post('/member', async (req, res) => {
-      const members = req.body;
-      const result = await memberCollection.insertOne(members);
-      res.send(result);
-    });
-
-    // review start
-    app.get('/review', async (req, res) => {
-
-
-      const query = {}
-      const purchases = await reviewCollection.find(query).toArray();
-      return res.send(purchases);
-
-
-
-    })
-    app.post('/review', async (req, res) => {
-      const purchase = req.body
-
-      const result = await reviewCollection.insertOne(purchase);
-      return res.send(result);
-    })
-    // ====Get Categories======
-    app.get('/member', async (req, res) => {
-      const query = {};
-      const cursor = memberCollection.find(query);
-      const result = await cursor.toArray();
-      res.send(result);
-    });
-    app.delete('/member/:email', async (req, res) => {
-      const email = req.params.email;
-      const filter = { email: email }
-      const result = await memberCollection.deleteOne(filter);
-      res.send(result);
-    })
-    // users Section
-    app.get('/user', async (req, res) => {
-      const users = await userCollection.find().toArray();
-      res.send(users);
-    })
-    app.get('/admin/:email', async (req, res) => {
-      const email = req.params.email;
-      const user = await userCollection.findOne({ email: email });
-      const isAdmin = user?.role === 'admin';
-      res.send({ admin: isAdmin });
-    })
-    app.put('/user/admin/:email', async (req, res) => {
-      const email = req.params.email;
-      const filter = { email: email }
-      const updateDoc = {
-        $set: { role: 'admin' },
-      };
-      const result = await userCollection.updateOne(filter, updateDoc);
-      res.send(result);
-    })
-
-    app.put('/user/:email', async (req, res) => {
-      const email = req.params.email;
-      const user = req.body;
-      const filter = { email: email }
-      const options = { upsert: true }
-      const updateDoc = {
-        $set: user,
-      };
-      const result = await userCollection.updateOne(filter, updateDoc, options);
-      res.send(result);
-    })
-    app.delete('/user/:email', async (req, res) => {
-      const email = req.params.email;
-      const filter = { email: email }
-      const result = await userCollection.deleteOne(filter);
-      res.send(result);
-    })
-
-
-  }
-  finally { }
 }
-run().catch(console.dir);
+
+
 
 const port = process.env.PORT || 8000;
 server.listen(port, () => console.log(`the web server is running on port ${port}`));
