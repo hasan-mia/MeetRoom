@@ -1,7 +1,7 @@
 import React from 'react';
 import { AiOutlinePushpin } from "react-icons/ai";
-import { FaCreativeCommons } from "react-icons/fa";
 import { BsRecordCircle } from "react-icons/bs";
+import { FaCreativeCommons } from "react-icons/fa";
 
 const SingleVideo = ({height, containerVideo, userVideo, partnerVideo, getUrl, copySuccess, toggleAudio, toggleVideo, hangUp, shareScreen, stopShare}) => {
 
@@ -17,16 +17,15 @@ const SingleVideo = ({height, containerVideo, userVideo, partnerVideo, getUrl, c
                 </div>
             </div>
 
-            <div className='rounded-xl bg-green-600 relative gap-2 mt-2'>
+            <div className='rounded-xl border border-green-500 relative gap-2 mt-2'>
                 <div className='text-gray-200 list-none text-xl flex gap-3 justify-start p-4 absolute'>
                     <li className='bg-green-400 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 rounded-xl p-1 '><FaCreativeCommons /></li>
                     <li className='bg-green-400 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 rounded-xl p-1 '><AiOutlinePushpin /></li>
-
                 </div>
                 
                 {/* =======Video Player======= */}
                     <div className="grid grid-cols-1 gap-2 justify-center rounded-xl p-2 relative" ref={containerVideo}>
-                        <video id="user" className="oneVideo absolute left-0 top-0" muted autoPlay playsInline ref = {userVideo} />
+                        <video id="user" height="50px" width="100px" className="oneVideo absolute left-0 top-0" muted autoPlay playsInline ref = {userVideo} />
                         <video id="peer" className="oneVideo relative" autoPlay playsInline ref = {partnerVideo} style={{width : `${height}px`}}/>
                     </div>               
                 

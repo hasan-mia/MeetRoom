@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import user from "../../assets/images/user.png"
+import user from "../../assets/images/user.png";
 import useSchedules from '../../hooks/useSchedules';
 import Loading from '../../pages/Register/Loading';
 
@@ -26,14 +26,14 @@ const Schedule = () => {
                 posts?.slice(0, 4).map((item) =>
                     <div className='border border-slate-700 p-2 my-2 rounded-md'>
                         <div className="flex justify-between">
-                            <h2 className='text-xl text-white'>{item.meetingPurpose}</h2>
+                            <h2 className='text-xl text-white'>{item?.meetingPurpose}</h2>
                             <button> <i className=" fad fa-ellipsis-h-alt bg-slate-800 text-xs px-3 py-1 hover:bg-slate-700 rounded font-medium text-white"></i> </button>
                         </div>
                         <div className="flex my-2">
                             <button> <i className=" fal fa-clock text-gray-200 text-xs font-small mr-2"></i> </button>
-                            <p><small className='text-white'>{item.startTime}</small></p>
+                            <p><small className='text-white'>{item?.startTime}</small></p>
                             <div className=" text-white mx-2">|</div>
-                            <p><small className='text-white'>{item.endTime} </small></p>
+                            <p><small className='text-white'>{item?.endTime} </small></p>
                         </div>
 
                         <div className='flex justify-between mt-2'>

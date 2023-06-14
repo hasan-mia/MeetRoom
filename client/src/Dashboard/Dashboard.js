@@ -1,14 +1,10 @@
-import React from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { Outlet, Link } from 'react-router-dom'
-import auth from '../firebase.init';
-import useAdmin from '../hooks/useAdmin';
-import logo from '../assets/images/logo.png';
 import { signOut } from 'firebase/auth';
+import React from 'react';
+import { Link, Outlet } from 'react-router-dom';
+import logo from '../assets/images/logo.png';
+import auth from '../firebase.init';
 
 const Dashboard = () => {
-    const [user] = useAuthState(auth);
-    const [admin] = useAdmin(user)
     const logout = () => {
         signOut(auth);
     };

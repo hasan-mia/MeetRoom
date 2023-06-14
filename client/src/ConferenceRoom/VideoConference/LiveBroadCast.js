@@ -2,10 +2,10 @@ import axios from 'axios';
 import React, { useRef } from 'react';
 
 // setting the constraints of video box
-const videoConstraints = {
-    height: window.innerHeight / 2,
-    width: window.innerWidth / 2
-};
+// const videoConstraints = {
+//     height: window.innerHeight / 2,
+//     width: window.innerWidth / 2
+// };
 
 const LiveBroadCast = () => {
     const userStream = useRef();

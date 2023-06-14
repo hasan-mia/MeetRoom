@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import io from "socket.io-client";
-import SingleVideo from '../../components/Video/SingleVideo';
-import SignleChat from '../../components/Chat/SignleChat';
-import { useParams } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useParams } from 'react-router-dom';
+import io from "socket.io-client";
+import SignleChat from '../../components/Chat/SignleChat';
+import SingleVideo from '../../components/Video/SingleVideo';
 import auth from '../../firebase.init';
-import userPic from "../../assets/user.jpg";
 
 const SingleRoom = () => {
     const [user] = useAuthState(auth);
-    const userImg = user?.photoURL ? user?.photoURL : `${window.location.hostname}/${userPic}`;
+    const userImg = user?.photoURL ? user?.photoURL : `https://img.icons8.com/?size=512&id=108296&format=png`;
     const userName = user?.displayName;
     const { roomID } = useParams();
     // variables for different functionalities of video call
@@ -77,7 +76,7 @@ const SingleRoom = () => {
            return peer;
        },[])
 
-              // calling user a ( who created the room )
+        // calling user a ( who created the room )
        const callUser = useCallback( (userID) =>{
            // taking the peer ID
            peerRef.current = createPeer(userID);
@@ -85,8 +84,7 @@ const SingleRoom = () => {
            // streaming the user a stream
            // giving access to our peer of our individual stream
            // storing all the objects sent by the user into the senders array
-           userStream?.current?.getTracks().forEach(track => senders?.current?.push(
-                                                           peerRef?.current?.addTrack(track, userStream.current)));
+           userStream?.current?.getTracks().forEach(track => senders?.current?.push(peerRef?.current?.addTrack(track, userStream.current)));
    
            // creating a data channel for chatting
            sendChannel.current = peerRef?.current?.createDataChannel("sendChannel");
@@ -96,7 +94,7 @@ const SingleRoom = () => {
        // recieving the call
        const handleRecieveCall = useCallback( (incoming)=> {
            peerRef.current = createPeer();
-   
+
            // chatting
            peerRef.current.ondatachannel = (event) => {
                sendChannel.current = event?.channel;
@@ -111,14 +109,13 @@ const SingleRoom = () => {
                userStream.current.getTracks().forEach(track => peerRef?.current?.addTrack(track, userStream.current));
            }).then(() => {
            
-               // creating the answer
-               return peerRef?.current?.createAnswer();
+            // creating the answer
+            return peerRef?.current?.createAnswer();
            }).then(answer => {
            
                // setting local description
                return peerRef?.current?.setLocalDescription(answer);
            }).then(() => {
-   
                // sending data back to the caller
                const payload = {
                    target: incoming.caller,
@@ -142,7 +139,7 @@ const SingleRoom = () => {
                    document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
                    
                    // grabbing the room id from the url and then sending it to the socket io server
-                   socketRef.current = io.connect("https://meetroom.onrender.com");
+                   socketRef.current = io.connect("http://localhost:8000");
                    socketRef.current.emit("join room", {roomID, userName, userImg});
        
                    // user a is joining 
@@ -173,14 +170,7 @@ const SingleRoom = () => {
            }
    
        }, [user, callUser, handleRecieveCall, userName, roomID, userImg]);
-       
-
-   
-       // recieving the messages from the peer
-       const handleReceiveMessage = (e) =>{
-           setMessages(messages => [...messages, {yours: false, value: e.data }]);
-       }
-   
+    
        
        // ================== CREATING THE PEER TO PEER CONNECTION ==========
    
@@ -289,17 +279,17 @@ const SingleRoom = () => {
            });
        }
    
-       // stopping screen share
-       const stopShare =()=> {
+        // stopping screen share
+        const stopShare =()=> {
            senders.current.find(sender => sender.track.kind === "video").replaceTrack(userStream.current.getTracks()[1]);
            document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
            document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
            document.getElementById('btn-share').classList = 'far fa-ban font-bold';
-       }
+        }
    
-       // Copy the Url
-       const [copySuccess, setCopySuccess] = useState(''); 
-       const getUrl =()=> {
+        // Copy the Url
+        const [copySuccess, setCopySuccess] = useState(''); 
+        const getUrl =()=> {
            var inputc = document.body.appendChild(document.createElement("input"));
            inputc.value = window.location.href;
            inputc.focus();
@@ -307,19 +297,45 @@ const SingleRoom = () => {
            document.execCommand('copy');
            inputc.parentNode.removeChild(inputc);
            setCopySuccess('Copied!');
-       }
+        }
    
-       // handling text change when recieved
-       const handleChange =(e)=> {
+        // handling text change when recieved
+        const handleChange =(e)=> {
            setText(e.target.value);
-       }
+        }
    
-       // sending message to the peer
-       const sendMessage =(e)=> {
-           sendChannel.current.send(text);
-           setMessages(messages => [...messages, { yours: true, value: text }]);
-           setText("");
-       }
+        // sending message to the peer
+        const sendMessage =(e)=> {
+            e.preventDefault();
+            const messageData = {
+                name: userName,
+                image: userImg,
+                message: text,
+            };
+            sendChannel.current.send(JSON.stringify(messageData));
+            setMessages(messages => [...messages, { yours: true, data: {
+                name: messageData.name,
+                image: messageData.image,
+                message: messageData.message
+                } }]);
+            setText("");
+        }
+
+        // Handle received message
+        const handleReceiveMessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        const receivedMessage = {
+            yours: false,
+            data: {
+            name: data.name,
+            image: data.image,
+            message: data.message,
+            },
+        };
+
+        setMessages((messages) => [...messages, receivedMessage]);
+        };
    
        // differentiating messages from user a and user b
        const renderMessage =(message, index) => {
@@ -328,11 +344,11 @@ const SingleRoom = () => {
                 <div className='flex justify-start items-center py-1 mb-1 flex-row-reverse text-right pr-1 gap-y-1'>
                     <div className="grid">
                         <div className="flex items-center">
-                            <p className='text-sm text-white p-1 rounded font-semibold'>{yourNameRef?.current || "Unknown"}</p>
-                            <img src={yourImageRef?.current} alt={yourNameRef?.current} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
+                            <p className='text-sm text-white p-1 rounded font-semibold'>{message?.data?.name || "You"}</p>
+                            <img src={message?.data?.image} alt={message?.data?.name} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
                         </div>
                         <div >
-                            <p className='text-md bg-slate-200 p-1 rounded'>{message.value}</p>
+                            <p className='text-md bg-slate-200 p-1 rounded'>{message?.data?.message}</p>
                         </div>
                     </div>
                 </div>
@@ -344,11 +360,11 @@ const SingleRoom = () => {
             <div key={index} className='flex items-center py-1 mb-1 justify-start gap-y-1'>
                    <div className="grid">
                         <div className="flex items-center">
-                            <img src={userNameRef?.current} alt={userNameRef?.current} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
-                            <p className='text-sm text-white p-1 rounded font-semibold'>{userNameRef?.current || "Unknown"}</p>
+                            <img src={message?.data?.image} alt={message?.data?.name} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
+                            <p className='text-sm text-white p-1 rounded font-semibold'>{message?.data?.name || "Ghost"}</p>
                         </div>
                         <div>
-                            <p className='text-md bg-slate-200 p-1 rounded'>{message.value}</p>
+                            <p className='text-md bg-slate-200 p-1 rounded'>{message?.data?.message}</p>
                         </div>
                    </div>
             </div>

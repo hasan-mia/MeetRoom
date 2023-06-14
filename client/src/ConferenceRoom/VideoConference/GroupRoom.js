@@ -14,7 +14,7 @@ const Video = (props) => {
         props.peer.on("stream", stream => {
             ref.current.srcObject = stream;
         })
-    }, []);
+    }, [props.peer]);
 
     return (
         <video className="groupVideo" playsInline autoPlay ref={ref} />
@@ -40,7 +40,7 @@ const GroupRoom = () => {
     const roomID =  roomGroupID;
 
     useEffect(() => {
-        socketRef.current = io.connect("https://meetroom.onrender.com");
+        socketRef.current = io.connect("http://localhost:8000");
         
          // ==========Asking for audio and video access============
         navigator.mediaDevices.getUserMedia({ audio: true, video: videoConstraints }).then(stream => {
@@ -106,7 +106,7 @@ const GroupRoom = () => {
                 setPeers(peers);
             })
         })
-    }, []);
+    }, [roomID]);
 
     // creating a peer object for newly joined user
     function createPeer(userToSignal, callerID, stream) {
