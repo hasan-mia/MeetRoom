@@ -32,8 +32,7 @@ io.on("connection", socket => {
     // ===========Handling one on one video call=============
 
     socket.on("join room", ({roomID, userName, userImg}) => {
-        // if the room is already created, that means a person has already joined the room
-        // then take the new user and push them into the same room
+
         // else create a new room
         if(rooms[roomID] === undefined){
             rooms[roomID] = [{ id: socketId, userName, userImg }];
@@ -85,7 +84,6 @@ io.on("connection", socket => {
         } else {
             users[roomID] = [socket.id];
         }
-
         // returning new room with all the attendees after new attendee joined
         socketToRoom[socket.id] = roomID;
         const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
@@ -104,6 +102,19 @@ io.on("connection", socket => {
 
     // handling user disconnect in group call
     socket.on('disconnect', () => {
+        // remove user form room if disconnect
+        for (const roomID in rooms) {
+            const room = rooms[roomID];
+            const index = room.findIndex(user => user.id === socketId);
+            if (index !== -1) {
+                room.splice(index, 1);
+                const otherUser = room[0];
+                if (otherUser) {
+                    socket.to(otherUser.id).emit("user left");
+                }
+                break; // Assuming a user can only be in one room, exit the loop after finding the room.
+            }
+        }
        
         // getting the group room array with all the participants
         const roomID = socketToRoom[socket.id];
@@ -228,13 +239,13 @@ io.on("connection", socket => {
 //     senderStream = e.streams[0];
 // }
 
-if (process.env.NODE_ENV == 'production') {
-    app.use(express.static('client/build'));
-    const path = require("path");
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-    });
-}
+// if (process.env.NODE_ENV == 'production') {
+//     app.use(express.static('client/build'));
+//     const path = require("path");
+//     app.get('*', (req, res) => {
+//         res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+//     });
+// }
 
 
 
