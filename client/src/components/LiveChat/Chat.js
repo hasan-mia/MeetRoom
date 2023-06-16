@@ -72,7 +72,7 @@ const Chat = ({ socket, username, room }) => {
                     onKeyPress={(event) => {
                         event.key === "Enter" && sendMessage();
                     }} />
-                <button onClick={sendMessage}> <i className="far fa-paper-plane text-2xl text-gray-200 font-medium"></i> </button>
+                <button  type="button" onClick={sendMessage}> <i className="far fa-paper-plane text-2xl text-gray-200 font-medium"></i> </button>
             </div>
         </div>
 

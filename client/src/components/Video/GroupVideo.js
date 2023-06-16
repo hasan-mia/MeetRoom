@@ -1,7 +1,7 @@
 import React from 'react';
 import { AiOutlinePushpin } from "react-icons/ai";
+import { BsPlus, BsRecordCircle } from "react-icons/bs";
 import { FaCreativeCommons } from "react-icons/fa";
-import { BsRecordCircle, BsPlus } from "react-icons/bs";
 import { IoPeopleOutline } from "react-icons/io5";
 
 const GroupVideo = ({userVideo, getUrl, copySuccess, hangUp, toggleAudio, toggleVideo, shareScreen, stopShare}) => {
@@ -16,7 +16,7 @@ const GroupVideo = ({userVideo, getUrl, copySuccess, hangUp, toggleAudio, toggle
                     </div>
                 </div>
                 <div className="tooltip mr-1 py-1 px-2 rounded text-white hover:bg-slate-700" data-tip={copySuccess ? copySuccess : 'COPY ID'}>
-                    <button className="text-gray-300" onClick={() => {getUrl()}}><small>Copy Link</small></button>
+                    <button  type="button" className="text-gray-300" onClick={() => {getUrl()}}><small>Copy Link</small></button>
                 </div>
             </div>
             <div className='text-gray-200 flex justify-between my-2'>
@@ -61,27 +61,27 @@ const GroupVideo = ({userVideo, getUrl, copySuccess, hangUp, toggleAudio, toggle
                  {/* =======Video Controller======= */}
                 <div className='grid grid-rows justify-center items-baseline relative'>
                     <div className='flex gap-2 md:gap-4 justify-center place-items-end text-gray-200 font-bold cursor-pointer list-none absolute bottom-8 left-1/3'>
-                       <button onClick = {toggleAudio}>
+                       <button  type="button" onClick = {toggleAudio}>
                             <li className='bg-green-400 rounded-md transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 font-bold'>
                                 <i className="fas fa-microphone font-bold" id="btn-a"></i> 
                             </li>
                         </button>
-                        <button onClick={toggleVideo}>
+                        <button  type="button" onClick={toggleVideo}>
                             <li className='bg-green-400 rounded-md transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 font-bold'>
                                 <i className="fal fa-video font-bold" id="btn-v"></i> 
                             </li>
                         </button>
-                        <button onClick = {hangUp}>
+                        <button  type="button" onClick = {hangUp}>
                             <li className='bg-red-500 rounded-md text-lg lg:text-2xl transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-2 lg:py-2'>
                                 <i className="far fa-phone-alt font-bold" id="btn-phone"></i>
                             </li>
                         </button>
-                        <button onClick = {shareScreen}>
+                        <button  type="button" onClick = {shareScreen}>
                             <li className='bg-green-400 rounded-md transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 '>
                                 <i className="fal fa-share-square font-bold" id="btn-share"></i>
                             </li>
                         </button>
-                        <button onClick = {stopShare}>
+                        <button  type="button" onClick = {stopShare}>
                             <li className='bg-green-400 rounded-md transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 '>
                                 <i className="far fa-ban font-bold" id="btn-stop"></i>
                             </li>

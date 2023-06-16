@@ -8,7 +8,7 @@ import auth from '../../firebase.init';
 
 const SingleRoom = () => {
     const [user] = useAuthState(auth);
-    const userImg = user?.photoURL ? user?.photoURL : `https://img.icons8.com/?size=512&id=108296&format=png`;
+    const userImg = (user && user.photoURL) ? user.photoURL : `https://img.icons8.com/?size=512&id=108296&format=png`;
     const userName = user?.displayName;
     const { roomID } = useParams();
     // variables for different functionalities of video call
@@ -28,8 +28,9 @@ const SingleRoom = () => {
        const sendChannel = useRef();
        const [text, setText] = useState("");
        const [messages, setMessages] = useState([]);
+       const [showEmojiPicker, setShowEmojiPicker] = useState(false);
     
-// user id of the person we are trying to call ( user b )
+        // user id of the person we are trying to call ( user b )
        // user b recieving the offer
        const createPeer = useCallback( (userID) =>{
            const peer = new RTCPeerConnection({
@@ -137,6 +138,7 @@ const SingleRoom = () => {
                    userStream.current = stream;
                    document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
                    // grabbing the room id from the url and then sending it to the socket io server
+                   //  https://meetroom.onrender.com http://localhost:8000
                    socketRef.current = io.connect("https://meetroom.onrender.com");
                    socketRef.current.emit("join room", {roomID, userName, userImg});
                    // user a is joining 
@@ -296,14 +298,25 @@ const SingleRoom = () => {
            setCopySuccess('Copied!');
         }
    
+        // Chat controling peer to peer
         // handling text change when recieved
+        const toggleEmojiPicker = () => {
+            setShowEmojiPicker(!showEmojiPicker);
+        };
         const handleChange =(e)=> {
            setText(e.target.value);
         }
+        const handleEmojiSelect = (emoji) => {
+            setText(text + emoji.native);
+            setShowEmojiPicker(false); 
+        };
    
         // sending message to the peer
         const sendMessage =(e)=> {
             e.preventDefault();
+            if (!text) {
+                return; // Return early if the input value is empty
+            }
             const messageData = {
                 name: userName,
                 image: userImg,
@@ -340,7 +353,7 @@ const SingleRoom = () => {
                return (
                 <div className='flex justify-start items-center py-1 mb-1 flex-row-reverse text-right pr-1 gap-y-1'>
                     <div className="grid">
-                        <div className="flex items-center">
+                        <div className="flex justify-end items-center mb-1">
                             <p className='text-sm text-white p-1 rounded font-semibold'>{message?.data?.name || "You"}</p>
                             <img src={message?.data?.image} alt={message?.data?.name} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
                         </div>
@@ -356,7 +369,7 @@ const SingleRoom = () => {
            return (
             <div key={index} className='flex items-center py-1 mb-1 justify-start gap-y-1'>
                    <div className="grid">
-                        <div className="flex items-center">
+                        <div className="flex items-center mb-1">
                             <img src={message?.data?.image} alt={message?.data?.name} className='w-8 h-8 p-1 border border-slate-600 ml-1 rounded-full' />
                             <p className='text-sm text-white p-1 rounded font-semibold'>{message?.data?.name || "Ghost"}</p>
                         </div>
@@ -369,11 +382,12 @@ const SingleRoom = () => {
        }
    
     return (
-        <div className="flex justify-center gap-1 flex-col lg:flex-row">
-            <div className="md:w-12/12 lg:w-7/12">
+        <div className="flex justify-center gap-1 flex-col lg:flex-row mt-2">
+            <div className="md:w-12/12 lg:w-7/12 chat-h">
                 <SingleVideo 
                     height={height}
                     containerVideo={containerVideo}
+                    socketRef={socketRef}
                     userVideo={userVideo}
                     partnerVideo={partnerVideo}
                     getUrl={getUrl}
@@ -389,7 +403,7 @@ const SingleRoom = () => {
             {/* ========Right Sidebar ========*/}
             <div className="md:w-12/12 lg:w-4/12">
                 {/* ========Single Chat Options ========*/}
-                <div className='pl-0 lg:pl-2' style={{height: '90vh'}}>
+                <div className='pl-0 lg:pl-2' id="chatContainer">
                     <h2 className='text-md lg:text-xl text-center uppercase font-semibold p-2 border border-green-700 rounded-md text-gray-400'>Live Chat</h2>
                     <SignleChat
                         text={text}
@@ -397,6 +411,9 @@ const SingleRoom = () => {
                         messages={messages}
                         renderMessage = {renderMessage}
                         sendMessage={sendMessage}
+                        showEmojiPicker={showEmojiPicker}
+                        toggleEmojiPicker={toggleEmojiPicker}
+                        handleEmojiSelect={handleEmojiSelect}
                     />
             </div>
                 

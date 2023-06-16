@@ -4,7 +4,6 @@ import TeamsCard from './TeamsCard';
 const Teams = () => {
     const [members, setMembers] = useState([])
 
-
     useEffect(() => {
         fetch('https://meetroom-server.onrender.com/member')
             .then(res => res.json())
@@ -35,4 +34,3 @@ const Teams = () => {
 };
 
 export default Teams;
-// className='grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 '

@@ -1,6 +1,5 @@
 import React from 'react';
-
-import Teams from '../../components/Team/Teams';
+// import Teams from '../../components/Team/Teams';
 
 const About = () => {
     return (
@@ -23,7 +22,7 @@ const About = () => {
 
             <section className='team py-4 px-0 lg:px-4'>
 
-                <Teams></Teams>
+                {/* <Teams></Teams> */}
             </section>
         </main>
     );

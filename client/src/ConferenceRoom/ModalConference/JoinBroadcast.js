@@ -16,9 +16,9 @@ const JoinBroadcast = () => {
                         <div className="modal-action">
                             <label for="my-modal-4" className="btn">Cancel</label>
                             <div className="flex gap-2 items-center">
-                            {/* <button className="schedule" onClick={() => setModalShow(true)}> Schedule Call </button> */}
+                            {/* <button  type="button" className="schedule" onClick={() => setModalShow(true)}> Schedule Call </button> */}
                             <Link to="/conference/schedule" className="btn">Schedule</Link>
-                            <button className="btn">Broadcast </button>
+                            <button  type="button" className="btn">Broadcast </button>
                             </div>
                         </div>
                     </div>

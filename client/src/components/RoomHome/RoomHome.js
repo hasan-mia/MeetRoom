@@ -1,14 +1,13 @@
-import React from 'react';
-import { useEffect, useState } from 'react';
-import Clock from 'react-clock';
-import { Link } from 'react-router-dom';
-import CreateSingleRoom from '../../ConferenceRoom/ModalConference/CreateSingleRoom';
-import CreateGroupRoom from '../../ConferenceRoom/ModalConference/CreateGroupRoom';
-import CreateChatRoom from '../../ConferenceRoom/ModalConference/CreateChatRoom';
-import CreateBroadcastRoom from '../../ConferenceRoom/ModalConference/CreateBroadcastRoom';
-import WatchBg from '../../assets/images/watchbg.jpg';
-import 'react-clock/dist/Clock.css';
+import React, { useEffect, useState } from 'react';
 import 'react-calendar/dist/Calendar.css';
+import Clock from 'react-clock';
+import 'react-clock/dist/Clock.css';
+import { Link } from 'react-router-dom';
+import CreateBroadcastRoom from '../../ConferenceRoom/ModalConference/CreateBroadcastRoom';
+import CreateChatRoom from '../../ConferenceRoom/ModalConference/CreateChatRoom';
+import CreateGroupRoom from '../../ConferenceRoom/ModalConference/CreateGroupRoom';
+import CreateSingleRoom from '../../ConferenceRoom/ModalConference/CreateSingleRoom';
+import WatchBg from '../../assets/images/watchbg.jpg';
 
 const RoomHome = () => {
     const [value, setValue] = useState(new Date());
@@ -24,11 +23,10 @@ const RoomHome = () => {
         };
     }, []);
     return (
-
         <div className='w-full mx-auto cursor-pointer'>
             <div className="flex flex-col lg:flex-row gap-2">
-                <div className="card w-12/12 lg:w-8/12 bg-base-100 shadow-xl h-full" style={{ backgroundImage: `url(${WatchBg})`, backgroundSize: 'cover' }}>
-                    <div className="card-body bg-clock text-gray-300">
+                <div className="card w-12/12 lg:w-8/12 bg-base-100" style={{ backgroundImage: `url(${WatchBg})`, backgroundSize: 'cover', borderRadius: '20px' }}>
+                    <div className="card-body bg-clock text-gray-300 rounded-xl">
                         <div className="flex flex-col md:flex-row justify-center lg:justify-between mx-auto">
                             <Clock value={value} />
                             <h2 className="card-title text-md lg:text-4xl p-2">{date}</h2>
@@ -38,13 +36,13 @@ const RoomHome = () => {
 
                 {/* ======Single Video Calling===== */}
                 <div className="card w-12/12 lg:w-4/12 bg-primary text-primary-content">
-                    <div className="card-body">
+                    <button type='button' className="card-body">
                         <div className="flex justify-start gap-1">
-                            <button><CreateSingleRoom /></button>
+                            <CreateSingleRoom/>
                         </div>
                         <h2 className="text-xl font-semibold">Single call</h2>
                         <p className='text-sm'>Start Calling</p>
-                    </div>
+                    </button>
                 </div>
             </div>
 
@@ -91,18 +89,6 @@ const RoomHome = () => {
                         </div>
                         <Link to="/conference/schedule" className="text-lg font-semibold">Schedule</Link>
                         <p className='text-sm'>plan your meeting</p>
-
-                    </div>
-                </div>
-
-                {/* ======Share Screen===== */}
-                <div className="card w-12/12 lg:w-6/12 bg-violet-600	 text-primary-content ml-0">
-                    <div className="card-body">
-                        <div className="card-actions justify-start">
-                            <i className="fal fa-desktop font-bold text-3xl bg-clock bg-transparent border border-gray-300  p-2"></i>
-                        </div>
-                        <h2 className="text-lg font-semibold">Share Screen</h2>
-                        <p className='text-sm'>show your interface</p>
 
                     </div>
                 </div>

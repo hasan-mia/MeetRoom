@@ -3,165 +3,168 @@
 @tailwind utilities;
 
 /* Color Code */
-.bg-header{
-  background-color: #1D4354;
+.bg-header {
+	background-color: #1d4354;
 }
-.bg-transparent{
-  background-color: #ffffff13;
+.bg-transparent {
+	background-color: #ffffff13;
 }
-.bg-user-transparent{
-  background-color: #5a5555a6;
+.bg-user-transparent {
+	background-color: #5a5555a6;
 }
-.bg-clock{
-  background-color: #e5989854;
+.bg-clock {
+	background-color: #e5989854;
 }
-.bg-green{
-  background-color: #70DEAD;
+.bg-green {
+	background-color: #70dead;
 }
-.bg-chat{
-  background-color: #1d1e36;
+.bg-chat {
+	background-color: #1d1e36;
 }
-.bg-video{
-  background-color: #334F43;
+.bg-video {
+	background-color: #334f43;
 }
-.bg-hover{
-  background-color: #4FBD8C;
+.bg-hover {
+	background-color: #4fbd8c;
 }
-.bg-overlay{
-  background-color: #7CCC97;
+.bg-overlay {
+	background-color: #7ccc97;
 }
-.bg-red{
-  background-color: #FE0000;
+.bg-red {
+	background-color: #fe0000;
 }
 /* Scrool Bar Design */
- /* Scroll */
- ::-webkit-scrollbar {
-  width: 8px;
-  background-color: #f4f4f6;
+/* Scroll */
+::-webkit-scrollbar {
+	width: 8px;
+	background-color: #f4f4f6;
 }
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px transparent;
-  border-radius: 10px;
-  min-height: 100vh;
+	box-shadow: inset 0 0 5px transparent;
+	border-radius: 10px;
+	min-height: 100vh;
 }
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #c1c3c6;
-  border: 1px solid transparent;
-  height: 50px;
+	background: #c1c3c6;
+	border: 1px solid transparent;
+	height: 50px;
 }
 
- /*Chatroom Scrollbar Design */
- /* Scroll */
+/*Chatroom Scrollbar Design */
+/* Scroll */
 .body::-webkit-scrollbar {
-  width: 6px;
-  background-color: rgba(63, 63, 63, 0);
+	width: 6px;
+	background-color: rgba(63, 63, 63, 0);
 }
 /* Track */
 .body::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px #12ad6a;
-  border-radius: 10px;
-  min-height: 100vh;
+	box-shadow: inset 0 0 5px #12ad6a;
+	border-radius: 10px;
+	min-height: 100vh;
 }
 /* Handle */
 .body::-webkit-scrollbar-thumb {
-  background: #4ADE80;
-  border: 1px solid #12ad6a;
-  border-radius: 10px;
-  height: 50px;
+	background: #4ade80;
+	border: 1px solid #12ad6a;
+	border-radius: 10px;
+	height: 50px;
 }
 /* OverWriting CSS */
-.logo .btn-ghost:hover, .btn-ghost.btn-active {
-  --tw-border-opacity: 0;
-  background-color: transparent;
-  --tw-bg-opacity: 0.2;
+.logo .btn-ghost:hover,
+.btn-ghost.btn-active {
+	--tw-border-opacity: 0;
+	background-color: transparent;
+	--tw-bg-opacity: 0.2;
 }
 
- /*Tab Scrollbar Design */
- /* Scroll */
- .tab-bar::-webkit-scrollbar {
-  width: 6px;
-  background-color: #24253fe5;
+/*Tab Scrollbar Design */
+/* Scroll */
+.tab-bar::-webkit-scrollbar {
+	width: 6px;
+	background-color: #24253fe5;
 }
 /* Track */
 .tab-bar::-webkit-scrollbar-track {
-  /* box-shadow: inset 0 0 5px #e4e7e5; */
-  border-radius: 10px;
-  min-height: 100vh;
+	/* box-shadow: inset 0 0 5px #e4e7e5; */
+	border-radius: 10px;
+	min-height: 100vh;
 }
 /* Handle */
 .tab-bar::-webkit-scrollbar-thumb {
-  background: rgb(12, 12, 12);
-  border: 1px solid #1d1e36;
-  border-radius: 10px;
-  height: 50px;
+	background: rgb(12, 12, 12);
+	border: 1px solid #1d1e36;
+	border-radius: 10px;
+	height: 50px;
 }
 /* OverWriting CSS */
-.logo .btn-ghost:hover, .btn-ghost.btn-active {
-  --tw-border-opacity: 0;
-  background-color: transparent;
-  --tw-bg-opacity: 0.2;
+.logo .btn-ghost:hover,
+.btn-ghost.btn-active {
+	--tw-border-opacity: 0;
+	background-color: transparent;
+	--tw-bg-opacity: 0.2;
 }
-.menu :where(li:not(.menu-title):not(:empty)) > :where(*:not(ul):focus), .menu :where(li:not(.menu-title):not(:empty)) > :where(*:not(ul):hover) {
-  background-color: transparent!important;
-  /* --tw-bg-opacity: 0.1; */
+.menu :where(li:not(.menu-title):not(:empty)) > :where(*:not(ul):focus),
+.menu :where(li:not(.menu-title):not(:empty)) > :where(*:not(ul):hover) {
+	background-color: transparent !important;
+	/* --tw-bg-opacity: 0.1; */
 }
 /* override other styles to make responsive */
 
-.chat-h{
-  max-height: 77vh;
-  height: 100vh;
+.chat-h {
+	max-height: 73vh;
+	height: 100vh;
 }
 .oneVideo {
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
+	width: 100%;
+	height: 100%;
+	border-radius: 10px;
 }
 
 #user {
-  height: auto;
-  width: 15vw!important;
-  top: 3%;
-  left: 2%;
-  border: 2px solid green;
-  z-index: 1;
+	height: auto;
+	width: 15vw !important;
+	top: 3%;
+	left: 2%;
+	border: 2px solid green;
+	z-index: 1;
 }
 
 #peer {
-  height: auto;
-  width: 100vw!important;
+	height: auto;
+	width: 100vw !important;
 }
 
 .groupVideo {
-  width: 100%!important;
-  height: auto!important;
-  padding: 5px;
-  border-radius: 10px;
+	width: 100% !important;
+	height: auto !important;
+	padding: 5px;
+	border-radius: 10px;
 }
 
-.group-one{
-  width: 100%!important;
-  height: auto!important;
-  border-radius: 10px;
+.group-one {
+	width: 100% !important;
+	height: auto !important;
+	border-radius: 10px;
 }
-.streamvideo{
-  padding-top: 5px;
-  width: 80vw!important;
-  height: auto!important;
-  border-radius: 10px;
+.streamvideo {
+	padding-top: 5px;
+	width: 80vw !important;
+	height: auto !important;
+	border-radius: 10px;
 }
 
-.left-40{
-  left: 40%;
+.left-40 {
+	left: 40%;
 }
 /* =====Media Query==== */
-@media(max-width:767px){
-  .hide-m{
-    display: none;
-  }
-  .chat-h{
-    max-height: 60vh;
-    height: 100vh;
-  }
+@media (max-width: 767px) {
+	.hide-m {
+		display: none;
+	}
+	.chat-h {
+		max-height: 60vh;
+		height: 100vh;
+	}
 }

@@ -18,7 +18,7 @@ const Contact = () => {
                                     <textarea className="textarea textarea-bordered h-24" placeholder="Send Message"></textarea>
                                 </div>
                                 <div className="form-control mt-6">
-                                    <button className="btn btn-primary">Send</button>
+                                    <button  type="button" className="btn btn-primary">Send</button>
                                 </div>
                         </div>                    
                     <div className="w-12/12 lg:w-8/12 ">
@@ -63,7 +63,7 @@ const Contact = () => {
                             <div className="max-w-md">
                                 <h1 className="mb-5 text-xl lg:text-5xl font-bold">Looking for new career?</h1>
                                 <p className="mb-5">Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a id nisi.</p>
-                                <button className="btn btn-primary">We are Hiring</button>
+                                <button  type="button" className="btn btn-primary">We are Hiring</button>
                             </div>
                         </div>
                     </div>

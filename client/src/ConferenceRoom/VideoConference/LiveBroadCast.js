@@ -120,22 +120,22 @@ const LiveBroadCast = () => {
                 {/* =======Video Controller======= */}
                 <div className='grid grid-rows justify-center items-baseline absolute bottom-8 left-40'>
                     <div className='flex gap-2 md:gap-4 justify-center place-items-end text-gray-200 font-bold cursor-pointer list-none'>
-                        <button onClick={toggleAudio}>
+                        <button  type="button" onClick={toggleAudio}>
                             <li className='bg-green-400 rounded-md transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 font-bold'>
                                 <i className="fas fa-microphone font-bold" id="btn-a"></i>
                             </li>
                         </button>
-                        <button id='start' onClick={init}>
+                        <button  type="button" id='start' onClick={init}>
                             <li className='bg-green-400 rounded-md transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 font-bold'>
                             <i className="far fa-signal-stream font-bold-"></i>
                             </li>
                         </button>
-                        <button onClick={toggleVideo}>
+                        <button  type="button" onClick={toggleVideo}>
                             <li className='bg-green-400 rounded-md transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 font-bold'>
                                 <i className="fal fa-video font-bold" id="avv"></i>
                             </li>
                         </button>
-                        <button onClick={hangUp}>
+                        <button  type="button" onClick={hangUp}>
                             <li className='bg-red-500 rounded-md transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 font-bold'>
                                 <i className="fad fa-stop font-bold" id="btn-phone"></i>
                             </li>

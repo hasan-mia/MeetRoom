@@ -105,7 +105,7 @@ const CreateGroupRoom = () => {
     //                 <div class="row">
     //                     <div class="col-6">
     //                         <input class="scheduleBtn" type="submit" value="Send" />
-    //                         <button class="scheduleBtn" onClick={props.onHide}> Close </button>
+    //                         <button  type="button" class="scheduleBtn" onClick={props.onHide}> Close </button>
     //                     </div>
     //                 </div>
 
@@ -130,9 +130,9 @@ const CreateGroupRoom = () => {
                         <div className="modal-action">
                             <label for="my-modal-2" className="btn">Cancel</label>
                             <div className="flex gap-2 items-center">
-                            {/* <button className="schedule" onClick={() => setModalShow(true)}> Schedule Call </button> */}
+                            {/* <button  type="button" className="schedule" onClick={() => setModalShow(true)}> Schedule Call </button> */}
                             <Link to="/conference/schedule" className="btn">Schedule</Link>
-                            <button className="btn" onClick={()=>create()}> Start meet </button>
+                            <button  type="button" className="btn" onClick={()=>create()}> Start meet </button>
                             </div>
                         </div>
                     </div>

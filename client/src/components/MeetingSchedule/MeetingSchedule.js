@@ -1,9 +1,9 @@
 import { format } from 'date-fns';
 import React, { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import 'react-day-picker/dist/style.css';
 
 const MeetingSchedule = () => {
     const [selectedDay, setSelectedDay] = useState(new Date());
@@ -102,7 +102,7 @@ const MeetingSchedule = () => {
                                <input defaultValue={format(selectedDay, 'PP')} {...register("date")} className="input input-bordered w-full"  {...register("date")} />
                             </div>
                         </div>
-                        <button className="btn rounded btn-block mt-4">Save </button>
+                        <button  type="button" className="btn rounded btn-block mt-4">Save </button>
                     </form> 
                 </div>
             </div>

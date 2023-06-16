@@ -2,8 +2,8 @@ import { signOut } from 'firebase/auth';
 import React from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Link } from 'react-router-dom';
-import auth from '../../firebase.init';
 import logo from '../../assets/images/logo.png';
+import auth from '../../firebase.init';
 import useAdmin from '../../hooks/useAdmin';
 
 const Navbar = () => {
@@ -43,7 +43,7 @@ const Navbar = () => {
                 <div className="navbar-end">
                     { admin && <Link to='/dashboard'>Dashboard</Link>}
                     <ul className="menu menu-horizontal p-0 text-gray-200">
-                        <li>{user ? <button onClick={logout} className="">Sign out</button> : <Link to="/signIn">Sign in</Link>}</li>
+                        <li>{user ? <button  type="button" onClick={logout} className="">Sign out</button> : <Link to="/signIn">Sign in</Link>}</li>
                     </ul>
                 </div>
             </div>

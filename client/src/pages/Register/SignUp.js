@@ -124,7 +124,7 @@ const SignUp = () => {
                         onClick={() => signInWithGoogle()}
                         className="btn btn-outline"
                     >Continue with Google</button>
-                    <button onClick={() => signInWithFacebook()
+                    <button  type="button" onClick={() => signInWithFacebook()
                     }
                         className="btn bg-blue-500  text-gray-200">
                         Continue with Facebook</button>
