@@ -73,7 +73,7 @@ const SingleVideo = ({height, containerVideo, socketRef, userVideo, partnerVideo
                 </div>
                 
                 {/* =======Video Player======= */}
-                    <div className="grid grid-cols-1 gap-2 justify-center rounded-xl p-2 relative" ref={containerVideo}>
+                    <div className="grid grid-cols-1 gap-2 justify-center rounded-xl p-2 relative" ref={containerVideo} style={{minHeight: `${partnerVideo?.current?.clientWidth - partnerVideo?.current?.clientWidth * 23 / 100}px`}}>
                         <video id="user" height="50px" width="100px" className="oneVideo absolute left-0 top-0" muted autoPlay playsInline ref = {userVideo} />
                         <video id="peer" className="oneVideo relative" autoPlay playsInline ref = {partnerVideo} style={{width : `${height}px`}}/>
                     </div>               

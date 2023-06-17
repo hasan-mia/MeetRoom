@@ -66,7 +66,7 @@ function App() {
           {/* group room */}
           <Route path="roomGroup/:roomGroupID" element={<GroupRoom/>} />
           {/* live broadcast */}
-          <Route path="liveCast" element={<LiveBroadCast/>} />
+          <Route path="/conference/live" element={<LiveBroadCast/>} />
 
           {/* just chat live */}
           <Route path="ChatLive" element={<LiveChat/>} />
