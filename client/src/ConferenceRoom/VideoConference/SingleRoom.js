@@ -130,43 +130,53 @@ const SingleRoom = () => {
 
        useEffect(() => {
            // ==========Asking for audio and video access============
-           if (roomID && user) {
-               navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
-                  setHeight( containerVideo.current.clientWidth -500)
-                   // streaming the audio and video and storing the local stream
-                   userVideo.current.srcObject = stream;
-                   userStream.current = stream;
-                   document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
-                   // grabbing the room id from the url and then sending it to the socket io server
-                   //  https://meetroom.onrender.com http://localhost:8000
-                   socketRef.current = io.connect("https://meetroom.onrender.com");
-                   socketRef.current.emit("join room", {roomID, userName, userImg});
-                   // user a is joining 
-                   socketRef.current.on('old user', ({userId, userName, userImg}) => {
-                       callUser(userId);
-                       usersID.current = userId;
-                       yourNameRef.current =userName;
-                       yourImageRef.current =userImg;
-                   });
-       
-                   // user b is joining
-                   socketRef.current.on("new user", ({newUserId, userName, userImg}) => {
-                       usersID.current = newUserId;
-                       userNameRef.current =userName;
-                       userImageRef.current =userImg;
-                   });
-       
-                   // calling the function when made an offer
-                   socketRef.current.on("offer", handleRecieveCall);
-                   
-                   // sending the answer back to socket
-                   socketRef.current.on("answer", handleAnswer);
-                   
-                   // joining the user after receiving offer
-                   socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
-               });
+            const enableVideoAudio = async () => {
+                try {
+
+                    if (roomID && user) {
+                        await  navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
+                            setHeight( containerVideo.current.clientWidth -500)
+                            // streaming the audio and video and storing the local stream
+                            userVideo.current.srcObject = stream;
+                            userStream.current = stream;
+                            document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
+                            // grabbing the room id from the url and then sending it to the socket io server
+                            //  https://meetroom.onrender.com http://localhost:8000
+                            socketRef.current = io.connect("https://meetroom.onrender.com");
+                            socketRef.current.emit("join room", {roomID, userName, userImg});
+                            // user a is joining 
+                            socketRef.current.on('old user', ({userId, userName, userImg}) => {
+                                callUser(userId);
+                                usersID.current = userId;
+                                yourNameRef.current =userName;
+                                yourImageRef.current =userImg;
+                            });
+                
+                            // user b is joining
+                            socketRef.current.on("new user", ({newUserId, userName, userImg}) => {
+                                usersID.current = newUserId;
+                                userNameRef.current =userName;
+                                userImageRef.current =userImg;
+                            });
+                
+                            // calling the function when made an offer
+                            socketRef.current.on("offer", handleRecieveCall);
+                            
+                            // sending the answer back to socket
+                            socketRef.current.on("answer", handleAnswer);
+                            
+                            // joining the user after receiving offer
+                            socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
+                        });
+                        
+                    }
+                    }
+                    catch (error) {
+                    console.log('Error accessing camera:', error);
+                }
             
-           }
+            }
+            enableVideoAudio();
    
        }, [user, callUser, handleRecieveCall, userName, roomID, userImg]);
     
@@ -257,34 +267,49 @@ const SingleRoom = () => {
        }
    
        // Sharing the Screen
-       const shareScreen =()=> {
-           // asking for the display media along with the cursor movement of the user sharing the screen
-           navigator.mediaDevices.getDisplayMedia({ cursor: true }).then(stream => {
-               const screenTrack = stream.getTracks()[0];
-   
-               // finding the track which has a type "video", and then replacing it with the current track which is playing
-               document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
-               senders.current.find(sender => sender.track.kind === 'video').replaceTrack(screenTrack);
-               
-               document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
-               document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
-               document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
-   
-               // when the screenshare is turned off, replace the displayed screen with the video of the user
-               screenTrack.onended = function() {
-                   senders.current.find(sender => sender.track.kind === "video").replaceTrack(userStream.current.getTracks()[1]);
-                   document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
-               }
-           });
+       const shareScreen = async ()=> {
+             try {
+                const stream = await navigator.mediaDevices.getDisplayMedia({ cursor: true });
+                const screenTrack = stream.getTracks()[0];
+                // Replace video track with screen track
+                const sender = senders.current.find((sender) => sender.track.kind === 'video');
+                if (sender) {
+                    await sender.replaceTrack(screenTrack);
+                }
+
+                    document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
+                    document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
+
+                // When screenshare is turned off, replace displayed screen with user's video track
+                screenTrack.onended = async () => {
+                const userVideoTrack = userStream.current.getVideoTracks()[0];
+                if (sender) {
+                    await sender.replaceTrack(userVideoTrack);
+                }
+                    document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
+                };
+            } catch (error) {
+                console.log('Error sharing screen:', error);
+            }
        }
    
         // stopping screen share
-        const stopShare =()=> {
-           senders.current.find(sender => sender.track.kind === "video").replaceTrack(userStream.current.getTracks()[1]);
-           document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
-           document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
-           document.getElementById('btn-share').classList = 'far fa-ban font-bold';
-        }
+        // const stopShare =()=> {
+        //    senders.current.find(sender => sender.track.kind === "video").replaceTrack(userStream.current.getTracks()[1]);
+        //    document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
+        //    document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
+        // }
+        const stopShare = () => {
+            const sender = senders.current.find((sender) => sender.track.kind === 'video');
+            if (sender) {
+                const userVideoTrack = userStream.current.getTracks()[1];
+                //  const userVideoTrack = userStream.current.getVideoTracks()[1];
+                sender.replaceTrack(userVideoTrack);
+
+                document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
+                document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
+            }
+        };
    
         // Copy the Url
         const [copySuccess, setCopySuccess] = useState(''); 
@@ -383,7 +408,7 @@ const SingleRoom = () => {
    
     return (
         <div className="flex justify-center gap-1 flex-col lg:flex-row mt-2">
-            <div className="md:w-12/12 lg:w-7/12 chat-h">
+            <div className="md:w-12/12 lg:w-7/12">
                 <SingleVideo 
                     height={height}
                     containerVideo={containerVideo}
