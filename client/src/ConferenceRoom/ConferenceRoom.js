@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
+import logo from '../assets/images/logo.png';
 import LeftNavbar from '../components/LeftNavbar/LeftNavbar';
-import logo from '../assets/images/logo.png'
 
 const ConferenceRoom = () => {
     let height = window.innerHeight;
@@ -12,7 +12,7 @@ const ConferenceRoom = () => {
                 <div className="flex display-flex">
                     <Link to="/" className="flex items-center position:hidden lg:pl-6 gap-1 normal-case md:text-xl font-semibold"><img src={logo} alt='Logo' className='w-1/6 text-left'/> MeetRoom</Link>
                 </div>
-                <label for="my-drawer-2" className="btn btn-ghost ml-2 border">
+                <label htmlFor="my-drawer-2" className="btn btn-ghost ml-2 border">
                     <i className="fad fa-align-left text-2xl"></i>
                 </label>
             </div>

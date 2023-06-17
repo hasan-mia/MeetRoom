@@ -18,10 +18,10 @@ const Navbar = () => {
             <div className="navbar">
                 <div className="navbar-start">
                     <div className="dropdown">
-                        <label tabindex="0" className="btn btn-ghost lg:hidden">
+                        <label tabIndex="0" className="btn btn-ghost lg:hidden">
                             <i className="fad fa-align-left text-2xl text-gray-200"></i>
                         </label>
-                        <ul tabindex="0" className="menu menu-compact dropdown-content mt-3 p-2 lg:p-2 shadow bg-base-100 rounded-box w-52">
+                        <ul tabIndex="0" className="menu menu-compact dropdown-content mt-3 p-2 lg:p-2 shadow bg-base-100 rounded-box w-52">
                             <li className='hover:bg-gray-600 hover:text-gray-200 transition-all'><Link to='/'>Home</Link></li>
                             <li className='hover:bg-gray-600 hover:text-gray-200 transition-all'><Link to='/about'>About</Link></li>
                             <li className='hover:bg-gray-600 hover:text-gray-200 transition-all'><Link to='/contact'>Contact</Link></li>

@@ -14,7 +14,7 @@ const Dashboard = () => {
                 <div className="flex display-flex">
                     <Link to='/' onClick={logout} className="flex items-center lg:pl-6 gap-1 normal-case md:text-xl font-semibold text-gray-200"><img src={logo} alt='Logo' className='w-1/6 text-left'/> MeetRoom</Link>
                 </div>
-                <label for="my-drawer-2" className="btn btn-ghost ml-2 border md:hidden">
+                <label htmlFor="my-drawer-2" className="btn btn-ghost ml-2 border md:hidden">
                     <i className="fad fa-align-left text-2xl text-gray-200"></i>
                 </label>
             </div>
@@ -26,7 +26,7 @@ const Dashboard = () => {
 
             </div>
             <div className="drawer-side">
-                <label for="my-drawer-2" className="drawer-overlay"></label>
+                <label htmlFor="my-drawer-2" className="drawer-overlay"></label>
                 <ul className="menu p-4 overflow-y-auto w-full bg-green-600 text-white">
                     {/* <div className="flex display-flex mb-4 lg:mb-8 border border-green-700 p-2 hide-m">
                         <Link to='/' onClick={logout}  className="flex items-center gap-1 normal-case md:text-xl font-semibold"><img src={logo} alt='Logo' className='w-1/6 text-left'/> MeetRoom</Link>

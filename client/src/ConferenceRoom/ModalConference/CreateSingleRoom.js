@@ -43,14 +43,14 @@ const CreateSingleRoom = () => {
         //             <h3 class="font-bold text-lg">Congratulations random Internet user!</h3>
         //             <p class="py-4">You've been selected for a chance to get one year of subscription to use Wikipedia for free!</p>
         //             <div class="modal-action">
-        //             <label for="my-modal-6" class="btn">Yay!</label>
+        //             <label htmlFor="my-modal-6" class="btn">Yay!</label>
         //             </div>
         //         </div>
         //     </div>
         // </div>
     return (
         <div className=' items-center justify-center'>
-            <label for="my-modal-1" className="hover:cursor-pointer"><i className="fal fa-video font-bold text-3xl bg-clock bg-transparent border border-slate-600 p-2"></i></label>
+            <label htmlFor="my-modal-1" className="hover:cursor-pointer"><i className="fal fa-video font-bold text-3xl bg-clock bg-transparent border border-slate-600 p-2"></i></label>
 
             <input type="checkbox" id="my-modal-1" className="modal-toggle" />
             
@@ -60,11 +60,11 @@ const CreateSingleRoom = () => {
                     <div className='flex justify-center gap-3'>
                         {/* Cancel Btn */}
                         <div className="modal-action">
-                            <label for="my-modal-1" className="btn">Cancel</label>
+                            <label htmlFor="my-modal-1" className="btn">Cancel</label>
                             <div className="flex gap-2 items-center">
                             {/* <button  type="button" className="schedule" onClick={() => setModalShow(true)}> Schedule Call </button> */}
                             <Link to="/conference/schedule" className="btn">Schedule</Link>
-                            {/* <button  type="button" class="btn"> <label for="my-modal-6" class="btn modal-button">Schedule</label> </button> */}
+                            {/* <button  type="button" class="btn"> <label htmlFor="my-modal-6" class="btn modal-button">Schedule</label> </button> */}
                             {/* <MyVerticallyCenteredModal show={modalShow} onHide={() => setModalShow(false)}/> */}
                             <button  type="button" className="btn"  onClick={()=>create()}> Single Call </button>
                             </div>
