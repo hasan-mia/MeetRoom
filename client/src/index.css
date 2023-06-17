@@ -159,12 +159,40 @@
 	left: 40%;
 }
 /* =====Media Query==== */
-@media (max-width: 767px) {
+
+@media only screen and (min-width: 310px) {
+	.chat-h {
+		max-height: 50vh;
+	}
+}
+
+@media only screen and (min-width: 375px) {
+	.chat-h {
+		max-height: 47vh;
+	}
+}
+@media only screen and (min-width: 414px) {
+	.chat-h {
+		max-height: 40vh;
+	}
+}
+
+@media only screen and (min-width: 540px) {
+	.chat-h {
+		max-height: 60vh;
+	}
+}
+@media only screen and (min-width: 820px) {
 	.hide-m {
 		display: none;
 	}
 	.chat-h {
-		max-height: 60vh;
-		height: 100vh;
+		max-height: 55vh;
+	}
+}
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+	.chat-h {
+		max-height: 72vh;
 	}
 }

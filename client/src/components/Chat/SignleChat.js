@@ -26,7 +26,7 @@ const SignleChat = ({text, handleChange, showEmojiPicker, toggleEmojiPicker, han
                
             </div>
 
-            <div className='flex items-center justify-center gap-2 bg-green-600 rounded p-2 mt-6'>
+            <div className='flex items-center justify-center gap-2 bg-green-600 rounded p-2 mt-1 lg:mt-6'>
                 <form className='flex items-center gap-2' onSubmit={sendMessage}>
                     <button><i className="far fa-image text-3xl text-gray-200"></i></button>
                     <input type="text" value={text} onChange={handleChange} placeholder="Type here" className="p-2 rounded-md border border-slate-600-none w-full px-2" />

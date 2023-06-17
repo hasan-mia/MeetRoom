@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { AiOutlinePushpin } from "react-icons/ai";
 import { BsRecordCircle } from "react-icons/bs";
-import { FaCreativeCommons } from "react-icons/fa";
 
 const SingleVideo = ({height, containerVideo, socketRef, userVideo, partnerVideo, getUrl, copySuccess, toggleAudio, toggleVideo, hangUp, shareScreen, stopShare}) => {
   const [isRecording, setIsRecording] = useState(false);
@@ -62,15 +60,15 @@ const SingleVideo = ({height, containerVideo, socketRef, userVideo, partnerVideo
                         
                 </div>
                 <div className="tooltip mr-1 py-1 px-2 rounded text-white hover:bg-slate-700" data-tip={copySuccess ? copySuccess : 'COPY ID'}>
-                    <button  type="button" className="text-gray-300" onClick={() => {getUrl()}}><small>Share Link</small></button>
+                    <button  type="button" className="text-gray-300 uppercase" onClick={() => {getUrl()}}><small>Share Link</small></button>
                 </div>
             </div>
 
             <div className='rounded-xl border border-green-500 relative gap-2 mt-2 h-fit'>
-                <div className='text-gray-200 list-none text-xl flex gap-3 justify-start p-4 absolute'>
+                {/* <div className='text-gray-200 list-none text-xl flex gap-3 justify-start p-4 absolute'>
                     <li className='bg-green-400 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 rounded-xl p-1 '><FaCreativeCommons /></li>
                     <li className='bg-green-400 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 rounded-xl p-1 '><AiOutlinePushpin /></li>
-                </div>
+                </div> */}
                 
                 {/* =======Video Player======= */}
                     <div className="grid grid-cols-1 gap-2 justify-center rounded-xl p-2 relative" ref={containerVideo} style={{minHeight: `${partnerVideo?.current?.clientWidth - partnerVideo?.current?.clientWidth * 23 / 100}px`}}>
@@ -80,8 +78,8 @@ const SingleVideo = ({height, containerVideo, socketRef, userVideo, partnerVideo
                 
 
                  {/* =======Video Controller======= */}
-                <div className='grid grid-rows justify-center items-baseline relative'>
-                    <div className='flex gap-2 md:gap-4 justify-center place-items-end text-gray-200 font-bold cursor-pointer list-none bottom-8 absolute left-1/3'>
+                <div className='flex flex-row justify-center items-baseline relative'>
+                    <div className='flex gap-2 md:gap-4 justify-center place-items-end text-gray-200 font-bold cursor-pointer list-none bottom-8 absolute'>
                         <button  type="button" onClick = {toggleAudio}>
                             <li className='bg-green-400 rounded-md transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 font-bold'>
                                 <i className="fas fa-microphone font-bold" id="btn-a"></i> 
