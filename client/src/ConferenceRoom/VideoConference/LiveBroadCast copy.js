@@ -1,5 +1,5 @@
-import axios from "axios";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // setting the constraints of video box
 // const videoConstraints = {
@@ -8,26 +8,21 @@ import React, { useRef } from "react";
 // };
 
 const LiveBroadCast = () => {
+	const navigate = useNavigate();
+	const [started, setStarted] = useState(false);
 	const userStream = useRef();
-	let started = false;
-
-	window.onload = () => {
-		document.getElementById("start").onclick = () => {
-			init();
-		};
-	};
-	async function init() {
+	const startBroadCast = async () => {
 		const stream = await navigator.mediaDevices.getUserMedia({
 			video: true,
 			audio: true,
 		});
 		document.getElementById("video").srcObject = stream;
 		userStream.current = stream;
-		started = true;
+		setStarted(true);
 		const peer = createPeer();
 		stream.getTracks().forEach((track) => peer.addTrack(track, stream));
-	}
-	function createPeer() {
+	};
+	const createPeer = () => {
 		const peer = new RTCPeerConnection({
 			iceServers: [
 				{ urls: "stun:stun.l.google.com:19302" },
@@ -65,24 +60,32 @@ const LiveBroadCast = () => {
 		});
 		peer.onnegotiationneeded = () => handleNegotiationNeededEvent(peer);
 		return peer;
-	}
-	async function handleNegotiationNeededEvent(peer) {
+	};
+	const handleNegotiationNeededEvent = async (peer) => {
 		const offer = await peer.createOffer();
 		await peer.setLocalDescription(offer);
-		const payload = {
-			sdp: peer.localDescription,
-		};
-
-		const { data } = await axios.post("/broadcast", payload);
-		const desc = new RTCSessionDescription(data.sdp);
-		peer.setRemoteDescription(desc).catch((e) => console.log(e));
-	}
+		const response = await fetch("http://localhost:8000/broadcast", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ sdp: peer.localDescription }),
+		});
+		console.log(response);
+		if (response.ok) {
+			const { sdp } = await response.json();
+			const answerDesc = new RTCSessionDescription(sdp);
+			await peer.setRemoteDescription(answerDesc).catch((e) => console.log(e));
+		} else {
+			console.error("Failed to start broadcast:", response.status);
+		}
+	};
 
 	const hangUp = () => {
 		if (started) {
 			userStream.current.getVideoTracks()[0].enabled = false;
 		}
-		window.location.replace("/conference");
+		navigate("/conference", { replace: true });
 	};
 
 	let isVideo = true;
@@ -127,7 +130,7 @@ const LiveBroadCast = () => {
 								<i className="fas fa-microphone font-bold" id="btn-a"></i>
 							</li>
 						</button>
-						<button type="button" id="start" onClick={init}>
+						<button type="button" id="start" onClick={startBroadCast}>
 							<li className="bg-green-400 rounded-md transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 font-bold">
 								<i className="far fa-signal-stream font-bold-"></i>
 							</li>
