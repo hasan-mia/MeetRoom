@@ -163,10 +163,9 @@ const SingleRoom = () => {
 							// streaming the audio and video and storing the local stream
 							userVideo.current.srcObject = stream;
 							userStream.current = stream;
-							document.getElementById("btn-stop").classList =
-								"far fa-ban font-bold";
+							document.getElementById("btn-v").classList =
+								"fal fa-video-slash font-bold";
 							// grabbing the room id from the url and then sending it to the socket io server
-							//  https://meetroom.onrender.com http://localhost:8000
 							socketRef.current = io.connect("https://meetroom.onrender.com");
 							socketRef.current.emit("join room", {
 								roomID,
