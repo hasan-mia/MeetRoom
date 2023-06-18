@@ -155,54 +155,54 @@ const SingleRoom = () => {
 		// ==========Asking for audio and video access============
 		const enableVideoAudio = async () => {
 			try {
-				if (roomID && user) {
-					await navigator.mediaDevices
-						.getUserMedia({ audio: true, video: true })
-						.then((stream) => {
-							setHeight(containerVideo.current.clientWidth - 500);
-							// streaming the audio and video and storing the local stream
-							userVideo.current.srcObject = stream;
-							userStream.current = stream;
-							document.getElementById("btn-v").classList =
-								"fal fa-video-slash font-bold";
-							// grabbing the room id from the url and then sending it to the socket io server
-							socketRef.current = io.connect("https://meetroom.onrender.com");
-							socketRef.current.emit("join room", {
-								roomID,
-								userName,
-								userImg,
-							});
-							// user a is joining
-							socketRef.current.on(
-								"old user",
-								({ userId, userName, userImg }) => {
-									callUser(userId);
-									usersID.current = userId;
-									yourNameRef.current = userName;
-									yourImageRef.current = userImg;
-								},
-							);
-
-							// user b is joining
-							socketRef.current.on(
-								"new user",
-								({ newUserId, userName, userImg }) => {
-									usersID.current = newUserId;
-									userNameRef.current = userName;
-									userImageRef.current = userImg;
-								},
-							);
-
-							// calling the function when made an offer
-							socketRef.current.on("offer", handleRecieveCall);
-
-							// sending the answer back to socket
-							socketRef.current.on("answer", handleAnswer);
-
-							// joining the user after receiving offer
-							socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
+				// if (roomID && user) {
+				await navigator.mediaDevices
+					.getUserMedia({ audio: true, video: true })
+					.then((stream) => {
+						setHeight(containerVideo.current.clientWidth - 500);
+						// streaming the audio and video and storing the local stream
+						userVideo.current.srcObject = stream;
+						userStream.current = stream;
+						document.getElementById("btn-v").classList =
+							"fal fa-video-slash font-bold";
+						// grabbing the room id from the url and then sending it to the socket io server
+						socketRef.current = io.connect("https://meetroom.onrender.com");
+						socketRef.current.emit("join room", {
+							roomID,
+							userName,
+							userImg,
 						});
-				}
+						// user a is joining
+						socketRef.current.on(
+							"old user",
+							({ userId, userName, userImg }) => {
+								callUser(userId);
+								usersID.current = userId;
+								yourNameRef.current = userName;
+								yourImageRef.current = userImg;
+							},
+						);
+
+						// user b is joining
+						socketRef.current.on(
+							"new user",
+							({ newUserId, userName, userImg }) => {
+								usersID.current = newUserId;
+								userNameRef.current = userName;
+								userImageRef.current = userImg;
+							},
+						);
+
+						// calling the function when made an offer
+						socketRef.current.on("offer", handleRecieveCall);
+
+						// sending the answer back to socket
+						socketRef.current.on("answer", handleAnswer);
+
+						// joining the user after receiving offer
+						socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
+					});
+				// }
 			} catch (error) {
 				console.log("Error accessing camera:", error);
 			}
