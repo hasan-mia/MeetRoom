@@ -164,7 +164,7 @@ const SingleRoom = () => {
 						userVideo.current.srcObject = stream;
 						userStream.current = stream;
 						document.getElementById("btn-v").classList =
-							"fal fa-video-slash font-bold";
+							"fal fa-video font-bold";
 						// grabbing the room id from the url and then sending it to the socket io server
 						socketRef.current = io.connect("https://meetroom.onrender.com");
 						socketRef.current.emit("join room", {

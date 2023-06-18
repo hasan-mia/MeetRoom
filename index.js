@@ -12,7 +12,6 @@ const io = socket(server, {
   },
 });
 const path = require("path");
-
 const bodyParser = require('body-parser');
 
 // app.use((req, res, next) => {
@@ -188,66 +187,66 @@ io.on("connection", socket => {
 //     res.json(payload);
 // });
 
-// ========Live Broadcast=========
-app.post('/broadcast', async ({ body }, res) => {
+// // ========Live Broadcast=========
+// app.post('/broadcast', async ({ body }, res) => {
 
-    // creating a peer connection only once
-    const peer = new RTCPeerConnection({
-        iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-                   { urls: 'stun:stun1.l.google.com:19302' },
-                   { urls: 'stun:stun2.l.google.com:19302' },
-                   { urls: 'stun:stun3.l.google.com:19302' },
-                   { urls: 'stun:stun4.l.google.com:19302' },
-                   { urls: "stun:openrelay.metered.ca:80" },
-                   {
-                       urls: 'turn:numb.viagenie.ca',
-                       credential: 'muazkh',
-                       username: 'webrtc@live.com'
-                   },
-                   {
-                    url: 'turn:turn.anyfirewall.com:443?transport=tcp',
-                    credential: 'webrtc',
-                    username: 'webrtc'
-                    },
-                    {
-                    urls: "turn:openrelay.metered.ca:80",
-                    username: "openrelayproject",
-                    credential: "openrelayproject",
-                    },
-                    {
-                    urls: "turn:openrelay.metered.ca:443",
-                    username: "openrelayproject",
-                    credential: "openrelayproject",
-                    },
-                    {
-                    urls: "turn:openrelay.metered.ca:443?transport=tcp",
-                    username: "openrelayproject",
-                    credential: "openrelayproject",
-                  },
-        ]
-    });
+//     // creating a peer connection only once
+//     const peer = new RTCPeerConnection({
+//         iceServers: [
+//             { urls: 'stun:stun.l.google.com:19302' },
+//                    { urls: 'stun:stun1.l.google.com:19302' },
+//                    { urls: 'stun:stun2.l.google.com:19302' },
+//                    { urls: 'stun:stun3.l.google.com:19302' },
+//                    { urls: 'stun:stun4.l.google.com:19302' },
+//                    { urls: "stun:openrelay.metered.ca:80" },
+//                    {
+//                        urls: 'turn:numb.viagenie.ca',
+//                        credential: 'muazkh',
+//                        username: 'webrtc@live.com'
+//                    },
+//                    {
+//                     url: 'turn:turn.anyfirewall.com:443?transport=tcp',
+//                     credential: 'webrtc',
+//                     username: 'webrtc'
+//                     },
+//                     {
+//                     urls: "turn:openrelay.metered.ca:80",
+//                     username: "openrelayproject",
+//                     credential: "openrelayproject",
+//                     },
+//                     {
+//                     urls: "turn:openrelay.metered.ca:443",
+//                     username: "openrelayproject",
+//                     credential: "openrelayproject",
+//                     },
+//                     {
+//                     urls: "turn:openrelay.metered.ca:443?transport=tcp",
+//                     username: "openrelayproject",
+//                     credential: "openrelayproject",
+//                   },
+//         ]
+//     });
 
-    // recieving the offer and sending our own description
-    peer.ontrack = (e) => handleTrackEvent(e, peer);
-    const desc = new RTCSessionDescription({
-        type: 'offer', // or 'answer' depending on the SDP type
-        sdp: sdp
-        });
-    // const desc = new webrtc.RTCSessionDescription(body.sdp);
-    await peer.RTCSessionDescription(desc);
-    const answer = await peer.createAnswer();
-    await peer.setLocalDescription(answer);
-    const payload = {
-        sdp: peer.localDescription
-    }
+//     // recieving the offer and sending our own description
+//     peer.ontrack = (e) => handleTrackEvent(e, peer);
+//     const desc = new RTCSessionDescription({
+//         type: 'offer', // or 'answer' depending on the SDP type
+//         sdp: sdp
+//         });
+//     // const desc = new webrtc.RTCSessionDescription(body.sdp);
+//     await peer.RTCSessionDescription(desc);
+//     const answer = await peer.createAnswer();
+//     await peer.setLocalDescription(answer);
+//     const payload = {
+//         sdp: peer.localDescription
+//     }
 
-    res.json(payload);
-});
+//     res.json(payload);
+// });
 
-function handleTrackEvent(e, peer) {
-    senderStream = e.streams[0];
-}
+// function handleTrackEvent(e, peer) {
+//     senderStream = e.streams[0];
+// }
 
 // if (process.env.NODE_ENV == 'production') {
 //     app.use(express.static('client/build'));
