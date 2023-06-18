@@ -34,7 +34,6 @@ const SingleRoom = () => {
 	const [messages, setMessages] = useState([]);
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 	const [showChat, setShowChat] = useState(false);
-
 	// user id of the person we are trying to call ( user b )
 	// user b recieving the offer
 	const createPeer = useCallback((userID) => {
@@ -49,6 +48,7 @@ const SingleRoom = () => {
 				{ urls: "stun:openrelay.metered.ca:80" },
 				{
 					urls: "turn:numb.viagenie.ca",
+					socketRef,
 					credential: "muazkh",
 					username: "webrtc@live.com",
 				},
@@ -91,20 +91,125 @@ const SingleRoom = () => {
 			// streaming the user a stream
 			// giving access to our peer of our individual stream
 			// storing all the objects sent by the user into the senders array
-			userStream.current
-				.getTracks()
+			userStream?.current
+				?.getTracks()
 				.forEach((track) =>
-					senders.current.push(
-						peerRef.current.addTrack(track, userStream.current),
+					senders?.current?.push(
+						peerRef?.current?.addTrack(track, userStream.current),
 					),
 				);
 
 			// creating a data channel for chatting
-			sendChannel.current = peerRef.current.createDataChannel("sendChannel");
+			sendChannel.current = peerRef?.current?.createDataChannel("sendChannel");
 			sendChannel.current.onmessage = handleReceiveMessage;
 		},
 		[createPeer],
 	);
+
+	// recieving the call
+	const handleRecieveCall = useCallback(
+		(incoming) => {
+			peerRef.current = createPeer();
+
+			// chatting
+			peerRef.current.ondatachannel = (event) => {
+				sendChannel.current = event?.channel;
+				sendChannel.current.onmessage = handleReceiveMessage;
+			};
+
+			// remote description
+			const desc = new RTCSessionDescription(incoming.sdp);
+
+			// setting remote description and attaching the stream
+			peerRef.current
+				.setRemoteDescription(desc)
+				.then(() => {
+					userStream.current
+						.getTracks()
+						.forEach((track) =>
+							peerRef?.current?.addTrack(track, userStream.current),
+						);
+				})
+				.then(() => {
+					// creating the answer
+					return peerRef?.current?.createAnswer();
+				})
+				.then((answer) => {
+					// setting local description
+					return peerRef?.current?.setLocalDescription(answer);
+				})
+				.then(() => {
+					// sending data back to the caller
+					const payload = {
+						target: incoming.caller,
+						caller: socketRef.current.id,
+						sdp: peerRef.current.localDescription,
+					};
+					socketRef.current.emit("answer", payload);
+				});
+		},
+		[createPeer],
+	);
+
+	useEffect(() => {
+		// ==========Asking for audio and video access============
+		const enableVideoAudio = async () => {
+			try {
+				// if (roomID && user) {
+				await navigator.mediaDevices
+					.getUserMedia({ audio: true, video: true })
+					.then((stream) => {
+						setHeight(containerVideo.current.clientWidth - 500);
+						// streaming the audio and video and storing the local stream
+						userVideo.current.srcObject = stream;
+						userStream.current = stream;
+						document.getElementById("btn-v").classList =
+							"fal fa-video font-bold";
+						// grabbing the room id from the url and then sending it to the socket io server
+						socketRef.current = io.connect("https://meetroom.onrender.com");
+						socketRef.current.emit("join room", {
+							roomID,
+							userName,
+							userImg,
+						});
+						// user a is joining
+						socketRef.current.on(
+							"old user",
+							({ userId, userName, userImg }) => {
+								callUser(userId);
+								usersID.current = userId;
+								yourNameRef.current = userName;
+								yourImageRef.current = userImg;
+							},
+						);
+
+						// user b is joining
+						socketRef.current.on(
+							"new user",
+							({ newUserId, userName, userImg }) => {
+								usersID.current = newUserId;
+								userNameRef.current = userName;
+								userImageRef.current = userImg;
+							},
+						);
+
+						// calling the function when made an offer
+						socketRef.current.on("offer", handleRecieveCall);
+
+						// sending the answer back to socket
+						socketRef.current.on("answer", handleAnswer);
+
+						// joining the user after receiving offer
+						socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
+					});
+				// }
+			} catch (error) {
+				console.log("Error accessing camera:", error);
+			}
+		};
+
+		enableVideoAudio();
+	}, [user, callUser, handleRecieveCall, userName, roomID, userImg]);
 
 	// ================== CREATING THE PEER TO PEER CONNECTION ==========
 
@@ -129,51 +234,6 @@ const SingleRoom = () => {
 			.catch((e) => console.log(e));
 	};
 
-	// recieving the call
-	const handleRecieveCall = useCallback(
-		(incoming) => {
-			peerRef.current = createPeer();
-
-			// chatting
-			peerRef.current.ondatachannel = (event) => {
-				sendChannel.current = event.channel;
-				sendChannel.current.onmessage = handleReceiveMessage;
-			};
-
-			// remote description
-			const desc = new RTCSessionDescription(incoming.sdp);
-
-			// setting remote description and attaching the stream
-			peerRef.current
-				.setRemoteDescription(desc)
-				.then(() => {
-					userStream.current
-						.getTracks()
-						.forEach((track) =>
-							peerRef.current.addTrack(track, userStream.current),
-						);
-				})
-				.then(() => {
-					// creating the answer
-					return peerRef.current.createAnswer();
-				})
-				.then((answer) => {
-					// setting local description
-					return peerRef.current.setLocalDescription(answer);
-				})
-				.then(() => {
-					// sending data back to the caller
-					const payload = {
-						target: incoming.caller,
-						caller: socketRef.current.id,
-						sdp: peerRef.current.localDescription,
-					};
-					socketRef.current.emit("answer", payload);
-				});
-		},
-		[createPeer],
-	);
-
 	// function to handle the answer which the user a (who created the call) is receiving
 	const handleAnswer = (message) => {
 		const desc = new RTCSessionDescription(message.sdp);
@@ -192,63 +252,15 @@ const SingleRoom = () => {
 			socketRef.current.emit("ice-candidate", payload);
 		}
 	};
-
 	// swapping candidates until they reach on an agreement
 	const handleNewICECandidateMsg = (incoming) => {
 		const candidate = new RTCIceCandidate(incoming);
 		peerRef.current.addIceCandidate(candidate).catch((e) => console.log(e));
 	};
-
 	// receiving the remote stream of peer and attaching the video of partner
 	const handleTrackEvent = (e) => {
 		partnerVideo.current.srcObject = e.streams[0];
 	};
-
-	useEffect(() => {
-		// ==========Asking for audio and video access============
-		navigator.mediaDevices
-			.getUserMedia({ audio: true, video: true })
-			.then((stream) => {
-				// streaming the audio and video and storing the local stream
-				userVideo.current.srcObject = stream;
-				userStream.current = stream;
-
-				document.getElementById("btn-chat").classList =
-					"fab fa-rocketchat font-bold";
-
-				// grabbing the room id from the url and then sending it to the socket io server
-				socketRef.current = io.connect("https://meetroom.onrender.com");
-				socketRef.current.emit("join room", {
-					roomID,
-					userName,
-					userImg,
-				});
-				// user a is joining
-				socketRef.current.on("old user", ({ userId, userName, userImg }) => {
-					callUser(userId);
-					usersID.current = userId;
-					yourNameRef.current = userName;
-					yourImageRef.current = userImg;
-				});
-
-				// user b is joining
-				socketRef.current.on("new user", ({ newUserId, userName, userImg }) => {
-					usersID.current = newUserId;
-					userNameRef.current = userName;
-					userImageRef.current = userImg;
-				});
-
-				// calling the function when made an offer
-				socketRef.current.on("offer", handleRecieveCall);
-
-				// sending the answer back to socket
-				socketRef.current.on("answer", handleAnswer);
-
-				// joining the user after receiving offer
-				socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
-			});
-		setHeight(containerVideo.current.clientWidth - 500);
-	}, [user, callUser, handleRecieveCall, userName, roomID, userImg]);
 
 	// Toggle Video
 	let isVideo = true;
@@ -319,31 +331,20 @@ const SingleRoom = () => {
 
 	// const stopShare = async () => {
 	//      try {
-	//         senders.current.find(sender => sender.track.kind === "video").replaceTrack(userStream.current.getTracks()[1]);
-	//      	document.getElementById('btn-stop').classList = 'far fa-ban font-bold';
-	//        	document.getElementById('btn-share').classList = 'fal fa-share-square font-bold';
-	//        	document.getElementById('btn-share').classList = 'far fa-ban font-bold';
+	//         const sender = senders.current.find((sender) => sender.track.kind === 'video');
+	//         if (sender) {
+	//         const userVideoTrack = await navigator.mediaDevices.getUserMedia({ video: true });
+	//         await sender.replaceTrack(userVideoTrack.getVideoTracks()[0]);
+	//         }
+	//         document.getElementById('btn-share').classList = 'far fa-ban font-bold';
 	//     } catch (error) {
 	//         console.log('Error stopping screen sharing:', error);
 	//     }
 	// };
 
 	// responsive chat option
-	const resPonsiveChat = async () => {
+	const resPonsiveChat = () => {
 		setShowChat(!showChat);
-		try {
-			await senders?.current
-				?.find((sender) => sender.track.kind === "video")
-				.replaceTrack(userStream?.current?.getTracks()[1]);
-			document.getElementById("btn-chat").classList =
-				"fab fa-rocketchat font-bold";
-			document.getElementById("btn-share").classList =
-				"fal fa-share-square font-bold";
-			document.getElementById("btn-share").classList =
-				"fal fa-share-square font-bold";
-		} catch (error) {
-			console.log("Error stopping screen sharing:", error);
-		}
 	};
 
 	// Copy the Url

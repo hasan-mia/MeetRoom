@@ -170,7 +170,7 @@ const SingleVideo = ({
 						</button>
 						<button type="button" onClick={resPonsiveChat}>
 							<li className="bg-green-400 rounded-md transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 ">
-								<i className="fab fa-rocketchat font-bold" id="btn-stop"></i>
+								<i className="fab fa-rocketchat font-bold" id="btn-chat"></i>
 							</li>
 						</button>
 					</div>
