@@ -1,19 +1,13 @@
 /* ------ IMPORTING FILES ------- */
 require("dotenv").config();
+const cors = require("cors");
 const express = require("express");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
 const socket = require("socket.io");
-const io = socket(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"],
-  },
-});
 const path = require("path");
-const bodyParser = require('body-parser');
-
+const bodyParser = require("body-parser");
 // app.use((req, res, next) => {
 //   res.header('Access-Control-Allow-Origin', '*'); 
 //   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
@@ -21,9 +15,16 @@ const bodyParser = require('body-parser');
 //   res.header('Access-Control-Allow-Headers', 'Content-Type, application/x-www-form-urlencoded"');
 //   next();
 // });
+app.use(cors());
 app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+const io = socket(server, {
+	cors: {
+		origin: "*",
+		methods: ["GET", "POST"],
+	},
+});
 
 /* =========== CREATING AND JOINING ROOMS FOR CONNECTION BETWEEN USERS =========*/
 // room object to store the created room IDs
