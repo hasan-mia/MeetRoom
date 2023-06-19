@@ -16,10 +16,10 @@ const SingleRoom = () => {
 	const userName = user?.displayName;
 	const { roomID } = useParams();
 	// variables for different functionalities of video call
-	const [height, setHeight] = useState(null);
+	// const containerVideo = useRef();
+	// const [height, setHeight] = useState(null);
 	const userVideo = useRef();
 	const partnerVideo = useRef();
-	const containerVideo = useRef();
 	const peerRef = useRef();
 	const socketRef = useRef();
 	const usersID = useRef();
@@ -247,7 +247,7 @@ const SingleRoom = () => {
 				// joining the user after receiving offer
 				socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
 			});
-		setHeight(containerVideo.current.clientWidth - 500);
+		// setHeight(containerVideo.current.clientWidth - 500);
 	}, [user, callUser, handleRecieveCall, userName, roomID, userImg]);
 
 	// Toggle Video
@@ -484,8 +484,8 @@ const SingleRoom = () => {
 				}
 			>
 				<SingleVideo
-					height={height}
-					containerVideo={containerVideo}
+					// height={height}
+					// containerVideo={containerVideo}
 					socketRef={socketRef}
 					userVideo={userVideo}
 					partnerVideo={partnerVideo}

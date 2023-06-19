@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { BsRecordCircle } from "react-icons/bs";
 
 const SingleVideo = ({
-	height,
-	containerVideo,
+	// height,
+	// containerVideo,
 	socketRef,
 	userVideo,
 	partnerVideo,
@@ -117,7 +117,7 @@ const SingleVideo = ({
 				{/* =======Video Player======= */}
 				<div
 					className="grid grid-cols-1 gap-2 justify-center rounded-xl p-2 relative"
-					ref={containerVideo}
+					// ref={containerVideo}
 					style={{
 						height: `${
 							partnerVideo?.current?.clientWidth -
@@ -141,7 +141,7 @@ const SingleVideo = ({
 						autoPlay
 						playsInline
 						ref={partnerVideo}
-						style={{ width: `${height}px` }}
+						// style={{ width: `${height}px` }}
 					/>
 				</div>
 
