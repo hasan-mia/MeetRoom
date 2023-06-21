@@ -108,19 +108,14 @@ const SingleVideo = ({
 				</div>
 			</div>
 
-			<div className="rounded-xl border border-green-500 relative gap-2 mt-2 h-fit" ref={containerVideo}>
-	
+			<div
+				className="rounded-xl border border-green-500 relative gap-2 mt-2 h-fit"
+				ref={containerVideo}
+			>
 				{/* =======Video Player======= */}
 				<div
-					className="grid grid-cols-1 justify-center rounded-xl relative"
+					className="grid grid-cols-1 justify-center items-center rounded-xl relative"
 					
-					style={{
-						height: `${
-							containerVideo?.current?.clientWidth -
-							(containerVideo?.current?.clientWidth * 25) / 100
-						}px`,
-					}}
-				
 				>
 					<video
 						id="user"
@@ -138,7 +133,13 @@ const SingleVideo = ({
 						autoPlay
 						playsInline
 						ref={partnerVideo}
-						// style={{ width: `${height}px` }}
+						style={{
+							height: `${
+								containerVideo?.current?.clientWidth -
+								(containerVideo?.current?.clientWidth * 25) / 100
+							}px`,
+							width: 'auto'
+						}}
 					/>
 				</div>
 
