@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { BsRecordCircle } from "react-icons/bs";
 
 const SingleVideo = ({
-	// height,
+	messages,
 	containerVideo,
 	socketRef,
 	userVideo,
@@ -113,10 +113,7 @@ const SingleVideo = ({
 				ref={containerVideo}
 			>
 				{/* =======Video Player======= */}
-				<div
-					className="grid grid-cols-1 justify-center items-center rounded-xl relative"
-					
-				>
+				<div className="grid grid-cols-1 justify-center items-center rounded-xl relative">
 					<video
 						id="user"
 						height="50px"
@@ -138,7 +135,7 @@ const SingleVideo = ({
 								containerVideo?.current?.clientWidth -
 								(containerVideo?.current?.clientWidth * 25) / 100
 							}px`,
-							width: 'auto'
+							width: "auto",
 						}}
 					/>
 				</div>
@@ -166,10 +163,13 @@ const SingleVideo = ({
 								<i className="fal fa-share-square font-bold" id="btn-share"></i>
 							</li>
 						</button>
-						<button type="button" onClick={resPonsiveChat}>
+						<button type="button" className="relative" onClick={resPonsiveChat}>
 							<li className="bg-green-400 rounded-md transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110 duration-300 px-2 lg:px-4 py-1 lg:py-2 ">
 								<i className="fab fa-rocketchat font-bold" id="btn-chat"></i>
 							</li>
+							<div className="badge badge-warning absolute -top-2 -right-5">
+								{messages?.length > 0 ? messages?.length : 0}
+							</div>
 						</button>
 					</div>
 				</div>

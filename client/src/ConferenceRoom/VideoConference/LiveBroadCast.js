@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -24,73 +23,66 @@ const LiveBroadCast = () => {
 		stream.getTracks().forEach((track) => peer.addTrack(track, stream));
 	};
 	const createPeer = () => {
-		const peer = new RTCPeerConnection({
-			iceServers: [
-				{ urls: "stun:stun.l.google.com:19302" },
-				{ urls: "stun:stun1.l.google.com:19302" },
-				{ urls: "stun:stun2.l.google.com:19302" },
-				{ urls: "stun:stun3.l.google.com:19302" },
-				{ urls: "stun:stun4.l.google.com:19302" },
-				{ urls: "stun:openrelay.metered.ca:80" },
-				{
-					urls: "turn:numb.viagenie.ca",
-					credential: "muazkh",
-					username: "webrtc@live.com",
-				},
-				{
-					url: "turn:turn.anyfirewall.com:443?transport=tcp",
-					credential: "webrtc",
-					username: "webrtc",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:80",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:443",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:443?transport=tcp",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-			],
-		});
-		peer.onnegotiationneeded = () => handleNegotiationNeededEvent(peer);
-		return peer;
+		if (typeof RTCPeerConnection === "undefined") {
+			console.error("RTCPeerConnection is not supported in this browser.");
+		} else {
+			const peer = new RTCPeerConnection({
+				iceServers: [
+					{ urls: "stun:stun.l.google.com:19302" },
+					{ urls: "stun:stun1.l.google.com:19302" },
+					{ urls: "stun:stun2.l.google.com:19302" },
+					{ urls: "stun:stun3.l.google.com:19302" },
+					{ urls: "stun:stun4.l.google.com:19302" },
+					{ urls: "stun:openrelay.metered.ca:80" },
+					{
+						urls: "turn:numb.viagenie.ca",
+						credential: "muazkh",
+						username: "webrtc@live.com",
+					},
+					{
+						url: "turn:turn.anyfirewall.com:443?transport=tcp",
+						credential: "webrtc",
+						username: "webrtc",
+					},
+					{
+						urls: "turn:openrelay.metered.ca:80",
+						username: "openrelayproject",
+						credential: "openrelayproject",
+					},
+					{
+						urls: "turn:openrelay.metered.ca:443",
+						username: "openrelayproject",
+						credential: "openrelayproject",
+					},
+					{
+						urls: "turn:openrelay.metered.ca:443?transport=tcp",
+						username: "openrelayproject",
+						credential: "openrelayproject",
+					},
+				],
+			});
+			peer.onnegotiationneeded = () => handleNegotiationNeededEvent(peer);
+			return peer;
+		}
 	};
 	const handleNegotiationNeededEvent = async (peer) => {
 		const offer = await peer.createOffer();
 		await peer.setLocalDescription(offer);
-		const payload = {
-			sdp: peer.localDescription,
-		};
-
-		const { data } = await axios.post(
-			"http://localhost:8000/broadcast",
-			payload,
-		);
-		console.log(data);
-		// const desc = new RTCSessionDescription(data.sdp);
-		// peer.setRemoteDescription(desc).catch((e) => console.log(e));
-		// const response = await fetch("http://localhost:8000/broadcast", {
-		// 	method: "POST",
-		// 	headers: {
-		// 		"Content-Type": "application/json",
-		// 	},
-		// 	body: JSON.stringify({ sdp: peer.localDescription }),
-		// });
+		const response = await fetch("http://localhost:8000/broadcast", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({ sdp: peer.localDescription }),
+		});
 		// console.log(response);
-		// if (response.ok) {
-		// 	const { sdp } = await response.json();
-		// 	const answerDesc = new RTCSessionDescription(sdp);
-		// 	await peer.setRemoteDescription(answerDesc).catch((e) => console.log(e));
-		// } else {
-		// 	console.error("Failed to start broadcast:");
-		// }
+		if (response.ok) {
+			const { sdp } = await response.json();
+			const answerDesc = new RTCSessionDescription(sdp);
+			await peer.setRemoteDescription(answerDesc).catch((e) => console.log(e));
+		} else {
+			console.error("Failed to start broadcast:", response.status);
+		}
 	};
 
 	const hangUp = () => {

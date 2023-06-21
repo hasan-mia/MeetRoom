@@ -580,6 +580,7 @@ const SingleRoom = () => {
 				}
 			>
 				<SingleVideo
+					messages={messages}
 					containerVideo={containerVideo}
 					socketRef={socketRef}
 					userVideo={userVideo}
