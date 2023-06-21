@@ -3,7 +3,7 @@ import { BsRecordCircle } from "react-icons/bs";
 
 const SingleVideo = ({
 	// height,
-	// containerVideo,
+	containerVideo,
 	socketRef,
 	userVideo,
 	partnerVideo,
@@ -108,22 +108,19 @@ const SingleVideo = ({
 				</div>
 			</div>
 
-			<div className="rounded-xl border border-green-500 relative gap-2 mt-2 h-fit">
-				{/* <div className='text-gray-200 list-none text-xl flex gap-3 justify-start p-4 absolute'>
-                    <li className='bg-green-400 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 rounded-xl p-1 '><FaCreativeCommons /></li>
-                    <li className='bg-green-400 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 rounded-xl p-1 '><AiOutlinePushpin /></li>
-                </div> */}
-
+			<div className="rounded-xl border border-green-500 relative gap-2 mt-2 h-fit" ref={containerVideo}>
+	
 				{/* =======Video Player======= */}
 				<div
-					className="grid grid-cols-1 gap-2 justify-center rounded-xl p-2 relative"
-					// ref={containerVideo}
+					className="grid grid-cols-1 justify-center rounded-xl relative"
+					
 					style={{
 						height: `${
-							partnerVideo?.current?.clientWidth -
-							(partnerVideo?.current?.clientWidth * 23) / 100
+							containerVideo?.current?.clientWidth -
+							(containerVideo?.current?.clientWidth * 25) / 100
 						}px`,
 					}}
+				
 				>
 					<video
 						id="user"
