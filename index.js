@@ -76,29 +76,29 @@ io.on("connection", socket => {
     });
 
     // ============Handling Group Video Call===============
-    socket.on("join room group", roomID => {
-        // getting the room with the room ID and adding the user to the room
-        if (users[roomID]) {
-            const length = users[roomID].length;
+    socket.on("join room group", ({ roomID, userName, userImg }) => {
+			// getting the room with the room ID and adding the user to the room
+			if (users[roomID]) {
+				const length = users[roomID].length;
 
-            // if 500 people have joined already, alert that room is full
-            if (length === 500) {
-                socket.emit("room full");
-                return;
-            }
-            users[roomID].push(socket.id);
-        } else {
-            users[roomID] = [socket.id];
-        }
-        // returning new room with all the attendees after new attendee joined
-        socketToRoom[socket.id] = roomID;
-        const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
-        socket.emit("all users", usersInThisRoom);
-    });
+				// if 500 people have joined already, alert that room is full
+				if (length === 500) {
+					socket.emit("room full");
+					return;
+				}
+				users[roomID].push({ id: socketId, userName, userImg });
+			} else {
+				users[roomID] = [{ id: socketId, userName, userImg }];
+			}
+			// returning new room with all the attendees after new attendee joined
+			socketToRoom[socketId] = { roomID, userName, userImg };
+			const usersInThisRoom = users[roomID].filter((user) => user.id !== socketId);
+			socket.emit("all users", usersInThisRoom);
+		});
 
-    // sending signal to existing members when user join
-    socket.on("sending signal", payload => {
-        io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
+		// sending signal to existing members when user join
+		socket.on("sending signal", payload => {
+		io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
     });
 
     // signal recieved by the user who joined
@@ -140,310 +140,310 @@ io.on("connection", socket => {
 
 
 // accepting the broadcast offer and sending it back to the node server
-app.post("/consumer", async ({ body }, res) => {
-    const peer = new RTCPeerConnection({
-			iceServers: [
-				{ urls: "stun:stun.relay.metered.ca:80" },
-				{ urls: "stun:stun.l.google.com:19302" },
-				{ urls: "stun:stun1.l.google.com:19302" },
-				{ urls: "stun:stun2.l.google.com:19302" },
-				{ urls: "stun:stun3.l.google.com:19302" },
-				{ urls: "stun:stun4.l.google.com:19302" },
-				{ urls: "stun:openrelay.metered.ca:80" },
-				{ urls: "stun:stun.ekiga.net" },
-				{ urls: "stun:stun.ideasip.com" },
-				{ urls: "stun:stun.rixtelecom.se" },
-				{ urls: "stun:stun.schlund.de" },
-				{ urls: "stun:stun.stunprotocol.org:3478" },
-				{ urls: "stun:stun.voiparound.com" },
-				{ urls: "stun:stun.voipbuster.com" },
-				{ urls: "stun:stun.voipstunt.com" },
-				{ urls: "stun:stun.voxgratia.org" },
-				{ urls: "stun:23.21.150.121:3478" },
-				{ urls: "stun:iphone-stun.strato-iphone.de:3478" },
-				{ urls: "stun:numb.viagenie.ca:3478" },
-				{ urls: "stun:s1.taraba.net:3478" },
-				{ urls: "stun:s2.taraba.net:3478" },
-				{ urls: "stun:stun.12connect.com:3478" },
-				{ urls: "stun:stun.12voip.com:3478" },
-				{ urls: "stun:stun.1und1.de:3478" },
-				{ urls: "stun:stun.2talk.co.nz:3478" },
-				{ urls: "stun:stun.2talk.com:3478" },
-				{ urls: "stun:stun.3clogic.com:3478" },
-				{ urls: "stun:stun.3cx.com:3478" },
-				{ urls: "stun:stun.a-mm.tv:3478" },
-				{ urls: "stun:stun.aa.net.uk:3478" },
-				{ urls: "stun:stun.acrobits.cz:3478" },
-				{ urls: "stun:stun.actionvoip.com:3478" },
-				{ urls: "stun:stun.advfn.com:3478" },
-				{ urls: "stun:stun.aeta-audio.com:3478" },
-				{ urls: "stun:stun.aeta.com:3478" },
-				{ urls: "stun:stun.alltel.com.au:3478" },
-				{ urls: "stun:stun.altar.com.pl:3478" },
-				{ urls: "stun:stun.annatel.net:3478" },
-				{ urls: "stun:stun.antisip.com:3478" },
-				{ urls: "stun:stun.arbuz.ru:3478" },
-				{ urls: "stun:stun.avigora.com:3478" },
-				{ urls: "stun:stun.avigora.fr:3478" },
-				{ urls: "stun:stun.awa-shima.com:3478" },
-				{ urls: "stun:stun.awt.be:3478" },
-				{ urls: "stun:stun.b2b2c.ca:3478" },
-				{ urls: "stun:stun.bahnhof.net:3478" },
-				{ urls: "stun:stun.barracuda.com:3478" },
-				{ urls: "stun:stun.bluesip.net:3478" },
-				{ urls: "stun:stun.bmwgs.cz:3478" },
-				{ urls: "stun:stun.botonakis.com:3478" },
-				{ urls: "stun:stun.budgetphone.nl:3478" },
-				{ urls: "stun:stun.budgetsip.com:3478" },
-				{ urls: "stun:stun.cablenet-as.net:3478" },
-				{ urls: "stun:stun.callromania.ro:3478" },
-				{ urls: "stun:stun.callwithus.com:3478" },
-				{ urls: "stun:stun.cbsys.net:3478" },
-				{ urls: "stun:stun.chathelp.ru:3478" },
-				{ urls: "stun:stun.cheapvoip.com:3478" },
-				{ urls: "stun:stun.ciktel.com:3478" },
-				{ urls: "stun:stun.cloopen.com:3478" },
-				{ urls: "stun:stun.colouredlines.com.au:3478" },
-				{ urls: "stun:stun.comfi.com:3478" },
-				{ urls: "stun:stun.commpeak.com:3478" },
-				{ urls: "stun:stun.comtube.com:3478" },
-				{ urls: "stun:stun.comtube.ru:3478" },
-				{ urls: "stun:stun.cope.es:3478" },
-				{ urls: "stun:stun.counterpath.com:3478" },
-				{ urls: "stun:stun.counterpath.net:3478" },
-				{ urls: "stun:stun.cryptonit.net:3478" },
-				{ urls: "stun:stun.darioflaccovio.it:3478" },
-				{ urls: "stun:stun.datamanagement.it:3478" },
-				{ urls: "stun:stun.dcalling.de:3478" },
-				{ urls: "stun:stun.decanet.fr:3478" },
-				{ urls: "stun:stun.demos.ru:3478" },
-				{ urls: "stun:stun.develz.org:3478" },
-				{ urls: "stun:stun.dingaling.ca:3478" },
-				{ urls: "stun:stun.doublerobotics.com:3478" },
-				{ urls: "stun:stun.drogon.net:3478" },
-				{ urls: "stun:stun.duocom.es:3478" },
-				{ urls: "stun:stun.dus.net:3478" },
-				{ urls: "stun:stun.e-fon.ch:3478" },
-				{ urls: "stun:stun.easybell.de:3478" },
-				{ urls: "stun:stun.easycall.pl:3478" },
-				{
-					urls: "turn:a.relay.metered.ca:80",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:a.relay.metered.ca:80?transport=tcp",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:a.relay.metered.ca:443",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:a.relay.metered.ca:443?transport=tcp",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:numb.viagenie.ca",
-					credential: "muazkh",
-					username: "webrtc@live.com",
-				},
-				{
-					url: "turn:turn.anyfirewall.com:443?transport=tcp",
-					credential: "webrtc",
-					username: "webrtc",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:80",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:443",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:443?transport=tcp",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-			],
-		});
-    const desc = new webrtc.RTCSessionDescription(body.sdp);
-    await peer.setRemoteDescription(desc);
-    senderStream.getTracks().forEach(track => peer.addTrack(track, senderStream));
-    const answer = await peer.createAnswer();
-    await peer.setLocalDescription(answer);
-    const payload = {
-        sdp: peer.localDescription
-    }
+// app.post("/consumer", async ({ body }, res) => {
+//     const peer = new RTCPeerConnection({
+// 			iceServers: [
+// 				{ urls: "stun:stun.relay.metered.ca:80" },
+// 				{ urls: "stun:stun.l.google.com:19302" },
+// 				{ urls: "stun:stun1.l.google.com:19302" },
+// 				{ urls: "stun:stun2.l.google.com:19302" },
+// 				{ urls: "stun:stun3.l.google.com:19302" },
+// 				{ urls: "stun:stun4.l.google.com:19302" },
+// 				{ urls: "stun:openrelay.metered.ca:80" },
+// 				{ urls: "stun:stun.ekiga.net" },
+// 				{ urls: "stun:stun.ideasip.com" },
+// 				{ urls: "stun:stun.rixtelecom.se" },
+// 				{ urls: "stun:stun.schlund.de" },
+// 				{ urls: "stun:stun.stunprotocol.org:3478" },
+// 				{ urls: "stun:stun.voiparound.com" },
+// 				{ urls: "stun:stun.voipbuster.com" },
+// 				{ urls: "stun:stun.voipstunt.com" },
+// 				{ urls: "stun:stun.voxgratia.org" },
+// 				{ urls: "stun:23.21.150.121:3478" },
+// 				{ urls: "stun:iphone-stun.strato-iphone.de:3478" },
+// 				{ urls: "stun:numb.viagenie.ca:3478" },
+// 				{ urls: "stun:s1.taraba.net:3478" },
+// 				{ urls: "stun:s2.taraba.net:3478" },
+// 				{ urls: "stun:stun.12connect.com:3478" },
+// 				{ urls: "stun:stun.12voip.com:3478" },
+// 				{ urls: "stun:stun.1und1.de:3478" },
+// 				{ urls: "stun:stun.2talk.co.nz:3478" },
+// 				{ urls: "stun:stun.2talk.com:3478" },
+// 				{ urls: "stun:stun.3clogic.com:3478" },
+// 				{ urls: "stun:stun.3cx.com:3478" },
+// 				{ urls: "stun:stun.a-mm.tv:3478" },
+// 				{ urls: "stun:stun.aa.net.uk:3478" },
+// 				{ urls: "stun:stun.acrobits.cz:3478" },
+// 				{ urls: "stun:stun.actionvoip.com:3478" },
+// 				{ urls: "stun:stun.advfn.com:3478" },
+// 				{ urls: "stun:stun.aeta-audio.com:3478" },
+// 				{ urls: "stun:stun.aeta.com:3478" },
+// 				{ urls: "stun:stun.alltel.com.au:3478" },
+// 				{ urls: "stun:stun.altar.com.pl:3478" },
+// 				{ urls: "stun:stun.annatel.net:3478" },
+// 				{ urls: "stun:stun.antisip.com:3478" },
+// 				{ urls: "stun:stun.arbuz.ru:3478" },
+// 				{ urls: "stun:stun.avigora.com:3478" },
+// 				{ urls: "stun:stun.avigora.fr:3478" },
+// 				{ urls: "stun:stun.awa-shima.com:3478" },
+// 				{ urls: "stun:stun.awt.be:3478" },
+// 				{ urls: "stun:stun.b2b2c.ca:3478" },
+// 				{ urls: "stun:stun.bahnhof.net:3478" },
+// 				{ urls: "stun:stun.barracuda.com:3478" },
+// 				{ urls: "stun:stun.bluesip.net:3478" },
+// 				{ urls: "stun:stun.bmwgs.cz:3478" },
+// 				{ urls: "stun:stun.botonakis.com:3478" },
+// 				{ urls: "stun:stun.budgetphone.nl:3478" },
+// 				{ urls: "stun:stun.budgetsip.com:3478" },
+// 				{ urls: "stun:stun.cablenet-as.net:3478" },
+// 				{ urls: "stun:stun.callromania.ro:3478" },
+// 				{ urls: "stun:stun.callwithus.com:3478" },
+// 				{ urls: "stun:stun.cbsys.net:3478" },
+// 				{ urls: "stun:stun.chathelp.ru:3478" },
+// 				{ urls: "stun:stun.cheapvoip.com:3478" },
+// 				{ urls: "stun:stun.ciktel.com:3478" },
+// 				{ urls: "stun:stun.cloopen.com:3478" },
+// 				{ urls: "stun:stun.colouredlines.com.au:3478" },
+// 				{ urls: "stun:stun.comfi.com:3478" },
+// 				{ urls: "stun:stun.commpeak.com:3478" },
+// 				{ urls: "stun:stun.comtube.com:3478" },
+// 				{ urls: "stun:stun.comtube.ru:3478" },
+// 				{ urls: "stun:stun.cope.es:3478" },
+// 				{ urls: "stun:stun.counterpath.com:3478" },
+// 				{ urls: "stun:stun.counterpath.net:3478" },
+// 				{ urls: "stun:stun.cryptonit.net:3478" },
+// 				{ urls: "stun:stun.darioflaccovio.it:3478" },
+// 				{ urls: "stun:stun.datamanagement.it:3478" },
+// 				{ urls: "stun:stun.dcalling.de:3478" },
+// 				{ urls: "stun:stun.decanet.fr:3478" },
+// 				{ urls: "stun:stun.demos.ru:3478" },
+// 				{ urls: "stun:stun.develz.org:3478" },
+// 				{ urls: "stun:stun.dingaling.ca:3478" },
+// 				{ urls: "stun:stun.doublerobotics.com:3478" },
+// 				{ urls: "stun:stun.drogon.net:3478" },
+// 				{ urls: "stun:stun.duocom.es:3478" },
+// 				{ urls: "stun:stun.dus.net:3478" },
+// 				{ urls: "stun:stun.e-fon.ch:3478" },
+// 				{ urls: "stun:stun.easybell.de:3478" },
+// 				{ urls: "stun:stun.easycall.pl:3478" },
+// 				{
+// 					urls: "turn:a.relay.metered.ca:80",
+// 					username: "bab9ca25580d0235617aea7e",
+// 					credential: "NVk1oJx3ogplGTuj",
+// 				},
+// 				{
+// 					urls: "turn:a.relay.metered.ca:80?transport=tcp",
+// 					username: "bab9ca25580d0235617aea7e",
+// 					credential: "NVk1oJx3ogplGTuj",
+// 				},
+// 				{
+// 					urls: "turn:a.relay.metered.ca:443",
+// 					username: "bab9ca25580d0235617aea7e",
+// 					credential: "NVk1oJx3ogplGTuj",
+// 				},
+// 				{
+// 					urls: "turn:a.relay.metered.ca:443?transport=tcp",
+// 					username: "bab9ca25580d0235617aea7e",
+// 					credential: "NVk1oJx3ogplGTuj",
+// 				},
+// 				{
+// 					urls: "turn:numb.viagenie.ca",
+// 					credential: "muazkh",
+// 					username: "webrtc@live.com",
+// 				},
+// 				{
+// 					url: "turn:turn.anyfirewall.com:443?transport=tcp",
+// 					credential: "webrtc",
+// 					username: "webrtc",
+// 				},
+// 				{
+// 					urls: "turn:openrelay.metered.ca:80",
+// 					username: "openrelayproject",
+// 					credential: "openrelayproject",
+// 				},
+// 				{
+// 					urls: "turn:openrelay.metered.ca:443",
+// 					username: "openrelayproject",
+// 					credential: "openrelayproject",
+// 				},
+// 				{
+// 					urls: "turn:openrelay.metered.ca:443?transport=tcp",
+// 					username: "openrelayproject",
+// 					credential: "openrelayproject",
+// 				},
+// 			],
+// 		});
+//     const desc = new webrtc.RTCSessionDescription(body.sdp);
+//     await peer.setRemoteDescription(desc);
+//     senderStream.getTracks().forEach(track => peer.addTrack(track, senderStream));
+//     const answer = await peer.createAnswer();
+//     await peer.setLocalDescription(answer);
+//     const payload = {
+//         sdp: peer.localDescription
+//     }
 
-    res.json(payload);
-});
+//     res.json(payload);
+// });
 
-// ========Live Broadcast=========
-app.post('/broadcast', async ({ body }, res) => {
-    let peer;
-	// creating a peer connection only once
-	if (typeof RTCPeerConnection === "undefined") {
-		console.error("RTCPeerConnection is not supported in this browser.");
-	} else {
-		const peer = new RTCPeerConnection({
-			iceServers: [
-				{ urls: "stun:stun.relay.metered.ca:80" },
-				{ urls: "stun:stun.l.google.com:19302" },
-				{ urls: "stun:stun1.l.google.com:19302" },
-				{ urls: "stun:stun2.l.google.com:19302" },
-				{ urls: "stun:stun3.l.google.com:19302" },
-				{ urls: "stun:stun4.l.google.com:19302" },
-				{ urls: "stun:openrelay.metered.ca:80" },
-				{ urls: "stun:stun.ekiga.net" },
-				{ urls: "stun:stun.ideasip.com" },
-				{ urls: "stun:stun.rixtelecom.se" },
-				{ urls: "stun:stun.schlund.de" },
-				{ urls: "stun:stun.stunprotocol.org:3478" },
-				{ urls: "stun:stun.voiparound.com" },
-				{ urls: "stun:stun.voipbuster.com" },
-				{ urls: "stun:stun.voipstunt.com" },
-				{ urls: "stun:stun.voxgratia.org" },
-				{ urls: "stun:23.21.150.121:3478" },
-				{ urls: "stun:iphone-stun.strato-iphone.de:3478" },
-				{ urls: "stun:numb.viagenie.ca:3478" },
-				{ urls: "stun:s1.taraba.net:3478" },
-				{ urls: "stun:s2.taraba.net:3478" },
-				{ urls: "stun:stun.12connect.com:3478" },
-				{ urls: "stun:stun.12voip.com:3478" },
-				{ urls: "stun:stun.1und1.de:3478" },
-				{ urls: "stun:stun.2talk.co.nz:3478" },
-				{ urls: "stun:stun.2talk.com:3478" },
-				{ urls: "stun:stun.3clogic.com:3478" },
-				{ urls: "stun:stun.3cx.com:3478" },
-				{ urls: "stun:stun.a-mm.tv:3478" },
-				{ urls: "stun:stun.aa.net.uk:3478" },
-				{ urls: "stun:stun.acrobits.cz:3478" },
-				{ urls: "stun:stun.actionvoip.com:3478" },
-				{ urls: "stun:stun.advfn.com:3478" },
-				{ urls: "stun:stun.aeta-audio.com:3478" },
-				{ urls: "stun:stun.aeta.com:3478" },
-				{ urls: "stun:stun.alltel.com.au:3478" },
-				{ urls: "stun:stun.altar.com.pl:3478" },
-				{ urls: "stun:stun.annatel.net:3478" },
-				{ urls: "stun:stun.antisip.com:3478" },
-				{ urls: "stun:stun.arbuz.ru:3478" },
-				{ urls: "stun:stun.avigora.com:3478" },
-				{ urls: "stun:stun.avigora.fr:3478" },
-				{ urls: "stun:stun.awa-shima.com:3478" },
-				{ urls: "stun:stun.awt.be:3478" },
-				{ urls: "stun:stun.b2b2c.ca:3478" },
-				{ urls: "stun:stun.bahnhof.net:3478" },
-				{ urls: "stun:stun.barracuda.com:3478" },
-				{ urls: "stun:stun.bluesip.net:3478" },
-				{ urls: "stun:stun.bmwgs.cz:3478" },
-				{ urls: "stun:stun.botonakis.com:3478" },
-				{ urls: "stun:stun.budgetphone.nl:3478" },
-				{ urls: "stun:stun.budgetsip.com:3478" },
-				{ urls: "stun:stun.cablenet-as.net:3478" },
-				{ urls: "stun:stun.callromania.ro:3478" },
-				{ urls: "stun:stun.callwithus.com:3478" },
-				{ urls: "stun:stun.cbsys.net:3478" },
-				{ urls: "stun:stun.chathelp.ru:3478" },
-				{ urls: "stun:stun.cheapvoip.com:3478" },
-				{ urls: "stun:stun.ciktel.com:3478" },
-				{ urls: "stun:stun.cloopen.com:3478" },
-				{ urls: "stun:stun.colouredlines.com.au:3478" },
-				{ urls: "stun:stun.comfi.com:3478" },
-				{ urls: "stun:stun.commpeak.com:3478" },
-				{ urls: "stun:stun.comtube.com:3478" },
-				{ urls: "stun:stun.comtube.ru:3478" },
-				{ urls: "stun:stun.cope.es:3478" },
-				{ urls: "stun:stun.counterpath.com:3478" },
-				{ urls: "stun:stun.counterpath.net:3478" },
-				{ urls: "stun:stun.cryptonit.net:3478" },
-				{ urls: "stun:stun.darioflaccovio.it:3478" },
-				{ urls: "stun:stun.datamanagement.it:3478" },
-				{ urls: "stun:stun.dcalling.de:3478" },
-				{ urls: "stun:stun.decanet.fr:3478" },
-				{ urls: "stun:stun.demos.ru:3478" },
-				{ urls: "stun:stun.develz.org:3478" },
-				{ urls: "stun:stun.dingaling.ca:3478" },
-				{ urls: "stun:stun.doublerobotics.com:3478" },
-				{ urls: "stun:stun.drogon.net:3478" },
-				{ urls: "stun:stun.duocom.es:3478" },
-				{ urls: "stun:stun.dus.net:3478" },
-				{ urls: "stun:stun.e-fon.ch:3478" },
-				{ urls: "stun:stun.easybell.de:3478" },
-				{ urls: "stun:stun.easycall.pl:3478" },
-				{
-					urls: "turn:a.relay.metered.ca:80",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:a.relay.metered.ca:80?transport=tcp",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:a.relay.metered.ca:443",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:a.relay.metered.ca:443?transport=tcp",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:numb.viagenie.ca",
-					credential: "muazkh",
-					username: "webrtc@live.com",
-				},
-				{
-					url: "turn:turn.anyfirewall.com:443?transport=tcp",
-					credential: "webrtc",
-					username: "webrtc",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:80",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:443",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:443?transport=tcp",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-			],
-		});
-	}
+// // ========Live Broadcast=========
+// app.post('/broadcast', async ({ body }, res) => {
+//     let peer;
+// 	// creating a peer connection only once
+// 	if (typeof RTCPeerConnection === "undefined") {
+// 		console.error("RTCPeerConnection is not supported in this browser.");
+// 	} else {
+// 		const peer = new RTCPeerConnection({
+// 			iceServers: [
+// 				{ urls: "stun:stun.relay.metered.ca:80" },
+// 				{ urls: "stun:stun.l.google.com:19302" },
+// 				{ urls: "stun:stun1.l.google.com:19302" },
+// 				{ urls: "stun:stun2.l.google.com:19302" },
+// 				{ urls: "stun:stun3.l.google.com:19302" },
+// 				{ urls: "stun:stun4.l.google.com:19302" },
+// 				{ urls: "stun:openrelay.metered.ca:80" },
+// 				{ urls: "stun:stun.ekiga.net" },
+// 				{ urls: "stun:stun.ideasip.com" },
+// 				{ urls: "stun:stun.rixtelecom.se" },
+// 				{ urls: "stun:stun.schlund.de" },
+// 				{ urls: "stun:stun.stunprotocol.org:3478" },
+// 				{ urls: "stun:stun.voiparound.com" },
+// 				{ urls: "stun:stun.voipbuster.com" },
+// 				{ urls: "stun:stun.voipstunt.com" },
+// 				{ urls: "stun:stun.voxgratia.org" },
+// 				{ urls: "stun:23.21.150.121:3478" },
+// 				{ urls: "stun:iphone-stun.strato-iphone.de:3478" },
+// 				{ urls: "stun:numb.viagenie.ca:3478" },
+// 				{ urls: "stun:s1.taraba.net:3478" },
+// 				{ urls: "stun:s2.taraba.net:3478" },
+// 				{ urls: "stun:stun.12connect.com:3478" },
+// 				{ urls: "stun:stun.12voip.com:3478" },
+// 				{ urls: "stun:stun.1und1.de:3478" },
+// 				{ urls: "stun:stun.2talk.co.nz:3478" },
+// 				{ urls: "stun:stun.2talk.com:3478" },
+// 				{ urls: "stun:stun.3clogic.com:3478" },
+// 				{ urls: "stun:stun.3cx.com:3478" },
+// 				{ urls: "stun:stun.a-mm.tv:3478" },
+// 				{ urls: "stun:stun.aa.net.uk:3478" },
+// 				{ urls: "stun:stun.acrobits.cz:3478" },
+// 				{ urls: "stun:stun.actionvoip.com:3478" },
+// 				{ urls: "stun:stun.advfn.com:3478" },
+// 				{ urls: "stun:stun.aeta-audio.com:3478" },
+// 				{ urls: "stun:stun.aeta.com:3478" },
+// 				{ urls: "stun:stun.alltel.com.au:3478" },
+// 				{ urls: "stun:stun.altar.com.pl:3478" },
+// 				{ urls: "stun:stun.annatel.net:3478" },
+// 				{ urls: "stun:stun.antisip.com:3478" },
+// 				{ urls: "stun:stun.arbuz.ru:3478" },
+// 				{ urls: "stun:stun.avigora.com:3478" },
+// 				{ urls: "stun:stun.avigora.fr:3478" },
+// 				{ urls: "stun:stun.awa-shima.com:3478" },
+// 				{ urls: "stun:stun.awt.be:3478" },
+// 				{ urls: "stun:stun.b2b2c.ca:3478" },
+// 				{ urls: "stun:stun.bahnhof.net:3478" },
+// 				{ urls: "stun:stun.barracuda.com:3478" },
+// 				{ urls: "stun:stun.bluesip.net:3478" },
+// 				{ urls: "stun:stun.bmwgs.cz:3478" },
+// 				{ urls: "stun:stun.botonakis.com:3478" },
+// 				{ urls: "stun:stun.budgetphone.nl:3478" },
+// 				{ urls: "stun:stun.budgetsip.com:3478" },
+// 				{ urls: "stun:stun.cablenet-as.net:3478" },
+// 				{ urls: "stun:stun.callromania.ro:3478" },
+// 				{ urls: "stun:stun.callwithus.com:3478" },
+// 				{ urls: "stun:stun.cbsys.net:3478" },
+// 				{ urls: "stun:stun.chathelp.ru:3478" },
+// 				{ urls: "stun:stun.cheapvoip.com:3478" },
+// 				{ urls: "stun:stun.ciktel.com:3478" },
+// 				{ urls: "stun:stun.cloopen.com:3478" },
+// 				{ urls: "stun:stun.colouredlines.com.au:3478" },
+// 				{ urls: "stun:stun.comfi.com:3478" },
+// 				{ urls: "stun:stun.commpeak.com:3478" },
+// 				{ urls: "stun:stun.comtube.com:3478" },
+// 				{ urls: "stun:stun.comtube.ru:3478" },
+// 				{ urls: "stun:stun.cope.es:3478" },
+// 				{ urls: "stun:stun.counterpath.com:3478" },
+// 				{ urls: "stun:stun.counterpath.net:3478" },
+// 				{ urls: "stun:stun.cryptonit.net:3478" },
+// 				{ urls: "stun:stun.darioflaccovio.it:3478" },
+// 				{ urls: "stun:stun.datamanagement.it:3478" },
+// 				{ urls: "stun:stun.dcalling.de:3478" },
+// 				{ urls: "stun:stun.decanet.fr:3478" },
+// 				{ urls: "stun:stun.demos.ru:3478" },
+// 				{ urls: "stun:stun.develz.org:3478" },
+// 				{ urls: "stun:stun.dingaling.ca:3478" },
+// 				{ urls: "stun:stun.doublerobotics.com:3478" },
+// 				{ urls: "stun:stun.drogon.net:3478" },
+// 				{ urls: "stun:stun.duocom.es:3478" },
+// 				{ urls: "stun:stun.dus.net:3478" },
+// 				{ urls: "stun:stun.e-fon.ch:3478" },
+// 				{ urls: "stun:stun.easybell.de:3478" },
+// 				{ urls: "stun:stun.easycall.pl:3478" },
+// 				{
+// 					urls: "turn:a.relay.metered.ca:80",
+// 					username: "bab9ca25580d0235617aea7e",
+// 					credential: "NVk1oJx3ogplGTuj",
+// 				},
+// 				{
+// 					urls: "turn:a.relay.metered.ca:80?transport=tcp",
+// 					username: "bab9ca25580d0235617aea7e",
+// 					credential: "NVk1oJx3ogplGTuj",
+// 				},
+// 				{
+// 					urls: "turn:a.relay.metered.ca:443",
+// 					username: "bab9ca25580d0235617aea7e",
+// 					credential: "NVk1oJx3ogplGTuj",
+// 				},
+// 				{
+// 					urls: "turn:a.relay.metered.ca:443?transport=tcp",
+// 					username: "bab9ca25580d0235617aea7e",
+// 					credential: "NVk1oJx3ogplGTuj",
+// 				},
+// 				{
+// 					urls: "turn:numb.viagenie.ca",
+// 					credential: "muazkh",
+// 					username: "webrtc@live.com",
+// 				},
+// 				{
+// 					url: "turn:turn.anyfirewall.com:443?transport=tcp",
+// 					credential: "webrtc",
+// 					username: "webrtc",
+// 				},
+// 				{
+// 					urls: "turn:openrelay.metered.ca:80",
+// 					username: "openrelayproject",
+// 					credential: "openrelayproject",
+// 				},
+// 				{
+// 					urls: "turn:openrelay.metered.ca:443",
+// 					username: "openrelayproject",
+// 					credential: "openrelayproject",
+// 				},
+// 				{
+// 					urls: "turn:openrelay.metered.ca:443?transport=tcp",
+// 					username: "openrelayproject",
+// 					credential: "openrelayproject",
+// 				},
+// 			],
+// 		});
+// 	}
 
-	 const desc = new RTCSessionDescriptionInit({
-			type: "offer", // or 'answer' depending on the SDP type
-			sdp: sdp,
-		});
+// 	 const desc = new RTCSessionDescriptionInit({
+// 			type: "offer", // or 'answer' depending on the SDP type
+// 			sdp: sdp,
+// 		});
 
-		await peer.setRemoteDescription(desc);
-		const answer = await peer.createAnswer();
-		await peer.setLocalDescription(answer);
+// 		await peer.setRemoteDescription(desc);
+// 		const answer = await peer.createAnswer();
+// 		await peer.setLocalDescription(answer);
 
-		// Set the ontrack event handler after setting the local description
-		peer.ontrack = (e) => handleTrackEvent(e, peer);
+// 		// Set the ontrack event handler after setting the local description
+// 		peer.ontrack = (e) => handleTrackEvent(e, peer);
 
-		const payload = {
-			sdp: peer.localDescription.sdp,
-		};
+// 		const payload = {
+// 			sdp: peer.localDescription.sdp,
+// 		};
 
-		res.json(payload);
-});
+// 		res.json(payload);
+// });
 
 function handleTrackEvent(e, peer) {
     senderStream = e.streams[0];
