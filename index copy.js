@@ -75,7 +75,7 @@ io.on("connection", (socket) => {
 	});
 
 	// ============Handling Group Video Call===============
-	socket.on("join room group", ({ roomID, userName, userImg, isHost }) => {
+	socket.on("join room group", (roomID) => {
 		// getting the room with the room ID and adding the user to the room
 		if (users[roomID]) {
 			const length = users[roomID].length;
@@ -85,19 +85,15 @@ io.on("connection", (socket) => {
 				socket.emit("room full");
 				return;
 			}
-			users[roomID].push({ id: socketId, userName, userImg, isHost });
+			users[roomID].push(socketId);
 		} else {
-			users[roomID] = [{ id: socketId, userName, userImg, isHost }];
+			users[roomID] = [socketId];
 		}
 
 		// returning new room with all the attendees after new attendee joined
 		socketToRoom[socketId] = roomID;
-        // console.log(socketToRoom[socketId]);
-		const usersInThisRoom = users[roomID].filter(
-			(user) => user.id !== socketId,
-		);
+		const usersInThisRoom = users[roomID].filter((id) => id !== socketId);
 		socket.emit("all users", usersInThisRoom);
-        console.log(usersInThisRoom);
 	});
 
 	// sending signal to existing members when user join

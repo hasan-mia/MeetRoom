@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useParams } from "react-router-dom";
@@ -29,7 +30,7 @@ const videoConstraints = {
 };
 
 const GroupRoom = () => {
-	const [user] = useAuthState(auth);
+	const[user] = useAuthState(auth);
 	const userImg =
 		user && user.photoURL
 			? user.photoURL
@@ -58,31 +59,21 @@ const GroupRoom = () => {
 				userVideo.current.srcObject = stream;
 				userStream.current = stream;
 
-				socketRef.current.emit("join room group", {
-					roomID,
-					userName,
-					userImg,
-					isHost: true,
-				});
+				socketRef.current.emit("join room group", roomID);
 
 				// getting all user for the new user joining in
 				socketRef.current.on("all users", (usersInThisRoom) => {
-					// console.log(usersInThisRoom);
 					const peers = [];
-					usersInThisRoom.forEach((user) => {
-						const peer = createPeer({
-							userToSignal: user.id,
-							callerID: socketRef.current.id,
-							stream,
-						});
 
+					// adding the new user to the group
+					usersInThisRoom.forEach((userID) => {
+						const peer = createPeer(userID, socketRef.current.id, stream);
 						peersRef.current.push({
-							peerID: user.id,
+							peerID: userID,
 							peer,
 						});
-
 						peers.push({
-							peerID: user.id,
+							peerID: userID,
 							peer,
 						});
 					});
@@ -107,30 +98,28 @@ const GroupRoom = () => {
 
 				// exisisting users recieving the signal
 				socketRef.current.on("receiving returned signal", (payload) => {
-					const item = peersRef.current.find(
-						(p) => p.peerID === payload.socketId,
-					);
+					const item = peersRef.current.find((p) => p.peerID === payload.id);
 					item.peer.signal(payload.signal);
 				});
 
 				// handling user disconnecting
-				socketRef.current.on("user left group", (socketId) => {
+				socketRef.current.on("user left group", (id) => {
 					// finding the id of the peer who just left
-					const peerObj = peersRef.current.find((p) => p.peerID === socketId);
+					const peerObj = peersRef.current.find((p) => p.peerID === id);
 					if (peerObj) {
 						peerObj.peer.destroy();
 					}
 
 					// removing the peer from the arrays and storing remaining peers in new array
-					const peers = peersRef.current.filter((p) => p.peerID !== socketId);
+					const peers = peersRef.current.filter((p) => p.peerID !== id);
 					peersRef.current = peers;
 					setPeers(peers);
 				});
 			});
-	}, [roomID, userImg, userName]);
+	}, [roomID]);
 
 	// creating a peer object for newly joined user
-	function createPeer({ userToSignal, callerID, stream }) {
+	function createPeer(userToSignal, callerID, stream) {
 		const peer = new Peer({
 			initiator: true,
 			trickle: false,
