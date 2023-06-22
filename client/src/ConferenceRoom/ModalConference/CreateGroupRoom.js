@@ -4,7 +4,7 @@ import { v1 as uuid } from "uuid";
 import useRoom from '../../hooks/useRoom';
 
 const CreateGroupRoom = () => {
-    const {setId} = useRoom()
+    const { setId, setIsHost } = useRoom();
     // creating a room id
     // redirecting the user to the correct page
     const groupRoom = useNavigate();
@@ -12,6 +12,7 @@ const CreateGroupRoom = () => {
         const id = uuid();
         groupRoom(`/conference/roomGroup/${id}`);
         setId(id)
+        setIsHost(true);
     }
 
     // // creating a room id for scheduling a call

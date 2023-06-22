@@ -97,7 +97,7 @@ io.on("connection", (socket) => {
 			(user) => user.id !== socketId,
 		);
 		socket.emit("all users", usersInThisRoom);
-        console.log(usersInThisRoom);
+        // console.log(usersInThisRoom);
 	});
 
 	// sending signal to existing members when user join
@@ -105,6 +105,7 @@ io.on("connection", (socket) => {
 		io.to(payload.userToSignal).emit("user joined", {
 			signal: payload.signal,
 			callerID: payload.callerID,
+			isHost: payload.isHost,
 		});
 	});
 
@@ -113,6 +114,7 @@ io.on("connection", (socket) => {
 		io.to(payload.callerID).emit("receiving returned signal", {
 			signal: payload.signal,
 			socketId: socketId,
+			isHost: payload.isHost,
 		});
 	});
 
@@ -133,21 +135,22 @@ io.on("connection", (socket) => {
 		}
 
 		// Remove the user from the group room upon disconnection
-		const groupRoomID = socketToRoom[socketId];
-		if (users[groupRoomID]) {
-			users[groupRoomID] = users[groupRoomID].filter(
-				(user) => user.id !== socketId,
-			);
-			// Broadcast the updated user list to all users in the room
-			const updatedUsersInThisRoom = users[groupRoomID].filter(
-				(user) => user.id !== socketId,
-			);
-			socket.broadcast
-				.to(groupRoomID)
-				.emit("all users", updatedUsersInThisRoom);
-		}
-		// Remove the socket from the socketToRoom mapping
-		delete socketToRoom[socketId];
+	// 	const groupRoomID = socketToRoom[socketId];
+	// 	if (users[groupRoomID]) {
+	// 		users[groupRoomID] = users[groupRoomID].filter(
+	// 			(user) => user.id !== socketId,
+	// 		);
+	// 		// Broadcast the updated user list to all users in the room
+	// 		const updatedUsersInThisRoom = users[groupRoomID].filter(
+	// 			(user) => user.id !== socketId,
+	// 		);
+	// 		socket.broadcast
+	// 			.to(groupRoomID)
+	// 			.emit("all users", updatedUsersInThisRoom);
+	// 	}
+	// 	// Remove the socket from the socketToRoom mapping
+	// 	delete socketToRoom[socketId];
+	// 	socket.emit("user left group", socketId);
 
 		// emiting a signal and sending it to everyone that a user left
 		socket.broadcast.emit("user left live", socketId);

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useParams } from "react-router-dom";
 import Peer from "simple-peer";
@@ -7,6 +7,7 @@ import Schedule from "../../components/Schedule/Schedule";
 import ParticipantSlide from "../../components/Slider/ParticipantSlide";
 import GroupVideo from "../../components/Video/GroupVideo";
 import auth from "../../firebase.init";
+import useRoom from "../../hooks/useRoom";
 // import GroupChat from '../../components/Chat/GroupChat';
 
 // Streaming Video of the user
@@ -29,7 +30,8 @@ const videoConstraints = {
 };
 
 const GroupRoom = () => {
-	const[user] = useAuthState(auth);
+	const [user] = useAuthState(auth);
+	const { isHost } = useRoom();
 	const userImg =
 		user && user.photoURL
 			? user.photoURL
@@ -44,6 +46,148 @@ const GroupRoom = () => {
 	const senders = useRef([]);
 	const userStream = useRef();
 	const roomID = roomGroupID;
+
+	// get all user if not hosted
+	const peerUsers = peers.filter(user=>user.isHost === false)
+	// find hosted user
+	const hostUser = peers.find(user=>user.isHost === true)
+	// creating a peer object for newly joined user
+	const createPeer = useCallback(
+		(userToSignal, callerID, stream) => {
+			const peer = new Peer({
+				initiator: true,
+				trickle: false,
+				config: {
+					iceServers: [
+						{ urls: "stun:stun.relay.metered.ca:80" },
+						{ urls: "stun:stun.l.google.com:19302" },
+						{ urls: "stun:stun1.l.google.com:19302" },
+						{ urls: "stun:stun2.l.google.com:19302" },
+						{ urls: "stun:stun3.l.google.com:19302" },
+						{ urls: "stun:stun4.l.google.com:19302" },
+						{ urls: "stun:openrelay.metered.ca:80" },
+						{
+							urls: "turn:a.relay.metered.ca:80",
+							username: "bab9ca25580d0235617aea7e",
+							credential: "NVk1oJx3ogplGTuj",
+						},
+						{
+							urls: "turn:a.relay.metered.ca:80?transport=tcp",
+							username: "bab9ca25580d0235617aea7e",
+							credential: "NVk1oJx3ogplGTuj",
+						},
+						{
+							urls: "turn:a.relay.metered.ca:443",
+							username: "bab9ca25580d0235617aea7e",
+							credential: "NVk1oJx3ogplGTuj",
+						},
+						{
+							urls: "turn:a.relay.metered.ca:443?transport=tcp",
+							username: "bab9ca25580d0235617aea7e",
+							credential: "NVk1oJx3ogplGTuj",
+						},
+						{
+							urls: "turn:openrelay.metered.ca:80",
+							username: "openrelayproject",
+							credential: "openrelayproject",
+						},
+						{
+							urls: "turn:openrelay.metered.ca:443",
+							username: "openrelayproject",
+							credential: "openrelayproject",
+						},
+						{
+							urls: "turn:openrelay.metered.ca:443?transport=tcp",
+							username: "openrelayproject",
+							credential: "openrelayproject",
+						},
+					],
+				},
+				stream,
+			});
+
+			peer.on("signal", (signal) => {
+				socketRef.current.emit("sending signal", {
+					userToSignal,
+					callerID,
+					signal,
+					isHost,
+				});
+			});
+
+			return peer;
+		},
+		[isHost],
+	);
+
+	// adding the newly joined peer to the room
+	const addPeer = useCallback(
+		(incomingSignal, callerID, stream, isHost) => {
+			const peer = new Peer({
+				initiator: false,
+				trickle: false,
+				config: {
+					iceServers: [
+						{ urls: "stun:stun.relay.metered.ca:80" },
+						{ urls: "stun:stun.l.google.com:19302" },
+						{ urls: "stun:stun1.l.google.com:19302" },
+						{ urls: "stun:stun2.l.google.com:19302" },
+						{ urls: "stun:stun3.l.google.com:19302" },
+						{ urls: "stun:stun4.l.google.com:19302" },
+						{ urls: "stun:openrelay.metered.ca:80" },
+						{
+							urls: "turn:a.relay.metered.ca:80",
+							username: "bab9ca25580d0235617aea7e",
+							credential: "NVk1oJx3ogplGTuj",
+						},
+						{
+							urls: "turn:a.relay.metered.ca:80?transport=tcp",
+							username: "bab9ca25580d0235617aea7e",
+							credential: "NVk1oJx3ogplGTuj",
+						},
+						{
+							urls: "turn:a.relay.metered.ca:443",
+							username: "bab9ca25580d0235617aea7e",
+							credential: "NVk1oJx3ogplGTuj",
+						},
+						{
+							urls: "turn:a.relay.metered.ca:443?transport=tcp",
+							username: "bab9ca25580d0235617aea7e",
+							credential: "NVk1oJx3ogplGTuj",
+						},
+						{
+							urls: "turn:openrelay.metered.ca:80",
+							username: "openrelayproject",
+							credential: "openrelayproject",
+						},
+						{
+							urls: "turn:openrelay.metered.ca:443",
+							username: "openrelayproject",
+							credential: "openrelayproject",
+						},
+						{
+							urls: "turn:openrelay.metered.ca:443?transport=tcp",
+							username: "openrelayproject",
+							credential: "openrelayproject",
+						},
+					],
+				},
+				stream,
+			});
+
+			peer.on("signal", (signal) => {
+				socketRef.current.emit("returning signal", {
+					signal,
+					callerID,
+					isHost,
+				});
+			});
+
+			peer.signal(incomingSignal);
+			return peer;
+		},
+		[],
+	);
 
 	useEffect(() => {
 		// grabbing the room id from the url and then sending it to the socket io server
@@ -62,6 +206,7 @@ const GroupRoom = () => {
 					roomID,
 					userName,
 					userImg,
+					isHost: isHost,
 				});
 
 				// getting all user for the new user joining in
@@ -78,10 +223,12 @@ const GroupRoom = () => {
 						peersRef.current.push({
 							peerID: user.socketId,
 							peer,
+							isHost,
 						});
 						peers.push({
 							peerID: user.socketId,
 							peer,
+							isHost,
 						});
 					});
 					setPeers(peers);
@@ -89,15 +236,17 @@ const GroupRoom = () => {
 
 				// sending signal to existing users after new user joined
 				socketRef.current.on("user joined", (payload) => {
-					const peer = addPeer(payload.signal, payload.callerID, stream);
+					const peer = addPeer(payload.signal, payload.callerID, stream, payload.isHost);
 					peersRef.current.push({
 						peerID: payload.callerID,
 						peer,
+						isHost: payload.isHost,
 					});
 
 					const peerObj = {
 						peer,
 						peerID: payload.callerID,
+						isHost: payload.isHost,
 					};
 
 					setPeers((users) => [...users, peerObj]);
@@ -125,134 +274,7 @@ const GroupRoom = () => {
 					setPeers(peers);
 				});
 			});
-	}, [roomID, userImg, userName]);
-
-	// creating a peer object for newly joined user
-	function createPeer(userToSignal, callerID, stream) {
-		const peer = new Peer({
-			initiator: true,
-			trickle: false,
-			config: {
-				iceServers: [
-					// { urls: "stun:stun.relay.metered.ca:80" },
-					{ urls: "stun:stun.l.google.com:19302" },
-					{ urls: "stun:stun1.l.google.com:19302" },
-					{ urls: "stun:stun2.l.google.com:19302" },
-					{ urls: "stun:stun3.l.google.com:19302" },
-					{ urls: "stun:stun4.l.google.com:19302" },
-					{ urls: "stun:openrelay.metered.ca:80" },
-					// {
-					// 	urls: "turn:a.relay.metered.ca:80",
-					// 	username: "bab9ca25580d0235617aea7e",
-					// 	credential: "NVk1oJx3ogplGTuj",
-					// },
-					// {
-					// 	urls: "turn:a.relay.metered.ca:80?transport=tcp",
-					// 	username: "bab9ca25580d0235617aea7e",
-					// 	credential: "NVk1oJx3ogplGTuj",
-					// },
-					// {
-					// 	urls: "turn:a.relay.metered.ca:443",
-					// 	username: "bab9ca25580d0235617aea7e",
-					// 	credential: "NVk1oJx3ogplGTuj",
-					// },
-					// {
-					// 	urls: "turn:a.relay.metered.ca:443?transport=tcp",
-					// 	username: "bab9ca25580d0235617aea7e",
-					// 	credential: "NVk1oJx3ogplGTuj",
-					// },
-					{
-						urls: "turn:openrelay.metered.ca:80",
-						username: "openrelayproject",
-						credential: "openrelayproject",
-					},
-					{
-						urls: "turn:openrelay.metered.ca:443",
-						username: "openrelayproject",
-						credential: "openrelayproject",
-					},
-					{
-						urls: "turn:openrelay.metered.ca:443?transport=tcp",
-						username: "openrelayproject",
-						credential: "openrelayproject",
-					},
-				],
-			},
-			stream,
-		});
-
-		peer.on("signal", (signal) => {
-			socketRef.current.emit("sending signal", {
-				userToSignal,
-				callerID,
-				signal,
-			});
-		});
-
-		return peer;
-	}
-
-	// adding the newly joined peer to the room
-	function addPeer(incomingSignal, callerID, stream) {
-		const peer = new Peer({
-			initiator: false,
-			trickle: false,
-			config: {
-				iceServers: [
-					// { urls: "stun:stun.relay.metered.ca:80" },
-					{ urls: "stun:stun.l.google.com:19302" },
-					{ urls: "stun:stun1.l.google.com:19302" },
-					{ urls: "stun:stun2.l.google.com:19302" },
-					{ urls: "stun:stun3.l.google.com:19302" },
-					{ urls: "stun:stun4.l.google.com:19302" },
-					{ urls: "stun:openrelay.metered.ca:80" },
-					// {
-					// 	urls: "turn:a.relay.metered.ca:80",
-					// 	username: "bab9ca25580d0235617aea7e",
-					// 	credential: "NVk1oJx3ogplGTuj",
-					// },
-					// {
-					// 	urls: "turn:a.relay.metered.ca:80?transport=tcp",
-					// 	username: "bab9ca25580d0235617aea7e",
-					// 	credential: "NVk1oJx3ogplGTuj",
-					// },
-					// {
-					// 	urls: "turn:a.relay.metered.ca:443",
-					// 	username: "bab9ca25580d0235617aea7e",
-					// 	credential: "NVk1oJx3ogplGTuj",
-					// },
-					// {
-					// 	urls: "turn:a.relay.metered.ca:443?transport=tcp",
-					// 	username: "bab9ca25580d0235617aea7e",
-					// 	credential: "NVk1oJx3ogplGTuj",
-					// },
-					{
-						urls: "turn:openrelay.metered.ca:80",
-						username: "openrelayproject",
-						credential: "openrelayproject",
-					},
-					{
-						urls: "turn:openrelay.metered.ca:443",
-						username: "openrelayproject",
-						credential: "openrelayproject",
-					},
-					{
-						urls: "turn:openrelay.metered.ca:443?transport=tcp",
-						username: "openrelayproject",
-						credential: "openrelayproject",
-					},
-				],
-			},
-			stream,
-		});
-
-		peer.on("signal", (signal) => {
-			socketRef.current.emit("returning signal", { signal, callerID });
-		});
-
-		peer.signal(incomingSignal);
-		return peer;
-	}
+	}, [roomID, userImg, userName, isHost, addPeer, createPeer]);
 
 	// Toggle Video
 	let isVideo = true;
@@ -345,6 +367,7 @@ const GroupRoom = () => {
 			<div className="md:w-12/12 lg:w-8/12">
 				<GroupVideo
 					userVideo={userVideo}
+					hostUser={hostUser}
 					//  peers={peers}
 					//  Video={Video}
 					getUrl={getUrl}
@@ -367,7 +390,7 @@ const GroupRoom = () => {
                     </div>
                 </div> */}
 				<div className="py-2">
-					<ParticipantSlide peers={peers} Video={Video} />
+					<ParticipantSlide peers={peerUsers} Video={Video} />
 				</div>
 			</div>
 
