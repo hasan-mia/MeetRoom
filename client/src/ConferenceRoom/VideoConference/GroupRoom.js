@@ -29,7 +29,7 @@ const videoConstraints = {
 };
 
 const GroupRoom = () => {
-	const [user] = useAuthState(auth);
+	const[user] = useAuthState(auth);
 	const userImg =
 		user && user.photoURL
 			? user.photoURL
@@ -62,27 +62,25 @@ const GroupRoom = () => {
 					roomID,
 					userName,
 					userImg,
-					isHost: true,
 				});
 
 				// getting all user for the new user joining in
-				socketRef.current.on("all users", (usersInThisRoom) => {
-					// console.log(usersInThisRoom);
+				socketRef.current.on("all users", (users) => {
 					const peers = [];
-					usersInThisRoom.forEach((user) => {
-						const peer = createPeer({
-							userToSignal: user.id,
-							callerID: socketRef.current.id,
-							stream,
-						});
 
+					// adding the new user to the group
+					users.forEach((user) => {
+						const peer = createPeer(
+							user.socketId,
+							socketRef.current.id,
+							stream,
+						);
 						peersRef.current.push({
-							peerID: user.id,
+							peerID: user.socketId,
 							peer,
 						});
-
 						peers.push({
-							peerID: user.id,
+							peerID: user.socketId,
 							peer,
 						});
 					});
@@ -114,15 +112,15 @@ const GroupRoom = () => {
 				});
 
 				// handling user disconnecting
-				socketRef.current.on("user left group", (socketId) => {
+				socketRef.current.on("user left group", (id) => {
 					// finding the id of the peer who just left
-					const peerObj = peersRef.current.find((p) => p.peerID === socketId);
+					const peerObj = peersRef.current.find((p) => p.peerID === id);
 					if (peerObj) {
 						peerObj.peer.destroy();
 					}
 
 					// removing the peer from the arrays and storing remaining peers in new array
-					const peers = peersRef.current.filter((p) => p.peerID !== socketId);
+					const peers = peersRef.current.filter((p) => p.peerID !== id);
 					peersRef.current = peers;
 					setPeers(peers);
 				});
@@ -130,39 +128,39 @@ const GroupRoom = () => {
 	}, [roomID, userImg, userName]);
 
 	// creating a peer object for newly joined user
-	function createPeer({ userToSignal, callerID, stream }) {
+	function createPeer(userToSignal, callerID, stream) {
 		const peer = new Peer({
 			initiator: true,
 			trickle: false,
 			config: {
 				iceServers: [
-					{ urls: "stun:stun.relay.metered.ca:80" },
+					// { urls: "stun:stun.relay.metered.ca:80" },
 					{ urls: "stun:stun.l.google.com:19302" },
 					{ urls: "stun:stun1.l.google.com:19302" },
 					{ urls: "stun:stun2.l.google.com:19302" },
 					{ urls: "stun:stun3.l.google.com:19302" },
 					{ urls: "stun:stun4.l.google.com:19302" },
 					{ urls: "stun:openrelay.metered.ca:80" },
-					{
-						urls: "turn:a.relay.metered.ca:80",
-						username: "bab9ca25580d0235617aea7e",
-						credential: "NVk1oJx3ogplGTuj",
-					},
-					{
-						urls: "turn:a.relay.metered.ca:80?transport=tcp",
-						username: "bab9ca25580d0235617aea7e",
-						credential: "NVk1oJx3ogplGTuj",
-					},
-					{
-						urls: "turn:a.relay.metered.ca:443",
-						username: "bab9ca25580d0235617aea7e",
-						credential: "NVk1oJx3ogplGTuj",
-					},
-					{
-						urls: "turn:a.relay.metered.ca:443?transport=tcp",
-						username: "bab9ca25580d0235617aea7e",
-						credential: "NVk1oJx3ogplGTuj",
-					},
+					// {
+					// 	urls: "turn:a.relay.metered.ca:80",
+					// 	username: "bab9ca25580d0235617aea7e",
+					// 	credential: "NVk1oJx3ogplGTuj",
+					// },
+					// {
+					// 	urls: "turn:a.relay.metered.ca:80?transport=tcp",
+					// 	username: "bab9ca25580d0235617aea7e",
+					// 	credential: "NVk1oJx3ogplGTuj",
+					// },
+					// {
+					// 	urls: "turn:a.relay.metered.ca:443",
+					// 	username: "bab9ca25580d0235617aea7e",
+					// 	credential: "NVk1oJx3ogplGTuj",
+					// },
+					// {
+					// 	urls: "turn:a.relay.metered.ca:443?transport=tcp",
+					// 	username: "bab9ca25580d0235617aea7e",
+					// 	credential: "NVk1oJx3ogplGTuj",
+					// },
 					{
 						urls: "turn:openrelay.metered.ca:80",
 						username: "openrelayproject",
@@ -201,33 +199,33 @@ const GroupRoom = () => {
 			trickle: false,
 			config: {
 				iceServers: [
-					{ urls: "stun:stun.relay.metered.ca:80" },
+					// { urls: "stun:stun.relay.metered.ca:80" },
 					{ urls: "stun:stun.l.google.com:19302" },
 					{ urls: "stun:stun1.l.google.com:19302" },
 					{ urls: "stun:stun2.l.google.com:19302" },
 					{ urls: "stun:stun3.l.google.com:19302" },
 					{ urls: "stun:stun4.l.google.com:19302" },
 					{ urls: "stun:openrelay.metered.ca:80" },
-					{
-						urls: "turn:a.relay.metered.ca:80",
-						username: "bab9ca25580d0235617aea7e",
-						credential: "NVk1oJx3ogplGTuj",
-					},
-					{
-						urls: "turn:a.relay.metered.ca:80?transport=tcp",
-						username: "bab9ca25580d0235617aea7e",
-						credential: "NVk1oJx3ogplGTuj",
-					},
-					{
-						urls: "turn:a.relay.metered.ca:443",
-						username: "bab9ca25580d0235617aea7e",
-						credential: "NVk1oJx3ogplGTuj",
-					},
-					{
-						urls: "turn:a.relay.metered.ca:443?transport=tcp",
-						username: "bab9ca25580d0235617aea7e",
-						credential: "NVk1oJx3ogplGTuj",
-					},
+					// {
+					// 	urls: "turn:a.relay.metered.ca:80",
+					// 	username: "bab9ca25580d0235617aea7e",
+					// 	credential: "NVk1oJx3ogplGTuj",
+					// },
+					// {
+					// 	urls: "turn:a.relay.metered.ca:80?transport=tcp",
+					// 	username: "bab9ca25580d0235617aea7e",
+					// 	credential: "NVk1oJx3ogplGTuj",
+					// },
+					// {
+					// 	urls: "turn:a.relay.metered.ca:443",
+					// 	username: "bab9ca25580d0235617aea7e",
+					// 	credential: "NVk1oJx3ogplGTuj",
+					// },
+					// {
+					// 	urls: "turn:a.relay.metered.ca:443?transport=tcp",
+					// 	username: "bab9ca25580d0235617aea7e",
+					// 	credential: "NVk1oJx3ogplGTuj",
+					// },
 					{
 						urls: "turn:openrelay.metered.ca:80",
 						username: "openrelayproject",

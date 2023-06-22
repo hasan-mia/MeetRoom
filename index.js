@@ -85,9 +85,9 @@ io.on("connection", (socket) => {
 				socket.emit("room full");
 				return;
 			}
-			users[roomID].push({ id: socketId, userName, userImg, isHost });
+			users[roomID].push({ socketId, userName, userImg, isHost });
 		} else {
-			users[roomID] = [{ id: socketId, userName, userImg, isHost }];
+			users[roomID] = [{ socketId, userName, userImg, isHost }];
 		}
 
 		// returning new room with all the attendees after new attendee joined
@@ -112,7 +112,7 @@ io.on("connection", (socket) => {
 	socket.on("returning signal", (payload) => {
 		io.to(payload.callerID).emit("receiving returned signal", {
 			signal: payload.signal,
-			id: socket.id,
+			socketId: socketId,
 		});
 	});
 
@@ -132,22 +132,22 @@ io.on("connection", (socket) => {
 			}
 		}
 
-		// // Remove the user from the group room upon disconnection
-		// const groupRoomID = socketToRoom[socketId];
-		// if (users[groupRoomID]) {
-		// 	users[groupRoomID] = users[groupRoomID].filter(
-		// 		(user) => user.id !== socketId,
-		// 	);
-		// 	// Broadcast the updated user list to all users in the room
-		// 	const updatedUsersInThisRoom = users[groupRoomID].filter(
-		// 		(user) => user.id !== socketId,
-		// 	);
-		// 	socket.broadcast
-		// 		.to(groupRoomID)
-		// 		.emit("all users", updatedUsersInThisRoom);
-		// }
-		// // Remove the socket from the socketToRoom mapping
-		// delete socketToRoom[socketId];
+		// Remove the user from the group room upon disconnection
+		const groupRoomID = socketToRoom[socketId];
+		if (users[groupRoomID]) {
+			users[groupRoomID] = users[groupRoomID].filter(
+				(user) => user.id !== socketId,
+			);
+			// Broadcast the updated user list to all users in the room
+			const updatedUsersInThisRoom = users[groupRoomID].filter(
+				(user) => user.id !== socketId,
+			);
+			socket.broadcast
+				.to(groupRoomID)
+				.emit("all users", updatedUsersInThisRoom);
+		}
+		// Remove the socket from the socketToRoom mapping
+		delete socketToRoom[socketId];
 
 		// emiting a signal and sending it to everyone that a user left
 		socket.broadcast.emit("user left live", socketId);
