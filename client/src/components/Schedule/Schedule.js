@@ -23,7 +23,7 @@ const Schedule = () => {
 	return (
 		<div className="bg-slate-900">
 			{posts?.slice(0, 4).map((item) => (
-				<div className="border border-slate-700 p-2 my-2 rounded-md">
+				<div className="border border-slate-700 p-2 my-2 rounded-md" key={Math.random()}>
 					<div className="flex justify-between">
 						<h2 className="text-xl text-white">{item?.meetingPurpose}</h2>
 						<button>

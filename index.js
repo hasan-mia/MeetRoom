@@ -28,8 +28,8 @@ const io = socket(server, {
 
 /* =========== CREATING AND JOINING ROOMS FOR CONNECTION BETWEEN USERS =========*/
 // room object to store the created room IDs
-const rooms = {};
-const users = {};
+const singleRoom = {};
+const groupRoom = {};
 const socketToRoom = {};
 
 io.on("connection", (socket) => {
@@ -38,18 +38,20 @@ io.on("connection", (socket) => {
 
 	socket.on("join room", ({ roomID, userName, userImg }) => {
 		// else create a new room
-		if (rooms[roomID] === undefined) {
-			rooms[roomID] = [{ id: socketId, userName, userImg }];
+		if (singleRoom[roomID] === undefined) {
+			singleRoom[roomID] = [{ id: socketId, userName, userImg }];
 		}
-		if (rooms[roomID] !== undefined) {
-			const existingUser = rooms[roomID]?.find((user) => user.id === socketId);
+		if (singleRoom[roomID] !== undefined) {
+			const existingUser = singleRoom[roomID]?.find(
+				(user) => user.id === socketId,
+			);
 			if (!existingUser) {
-				rooms[roomID].push({ id: socketId, userName, userImg });
+				singleRoom[roomID].push({ id: socketId, userName, userImg });
 			}
 		}
 
 		// finding the user - see if id is of the user in room exist
-		const user = rooms[roomID].find((user) => user.id !== socketId);
+		const user = singleRoom[roomID].find((user) => user.id !== socketId);
 		if (user) {
 			socket.emit("old user", { userId: user.id, userName, userImg });
 			// if someone new user has joined then we get the id of the other user
@@ -76,28 +78,41 @@ io.on("connection", (socket) => {
 
 	// ============Handling Group Video Call===============
 	socket.on("join room group", ({ roomID, userName, userImg, isHost }) => {
-		// getting the room with the room ID and adding the user to the room
-		if (users[roomID]) {
-			const length = users[roomID].length;
+		if (groupRoom[roomID]) {
+			const userIndex = groupRoom[roomID].findIndex(
+				(user) => user.socketId === socketId,
+			);
 
-			// if 500 people have joined already, alert that room is full
-			if (length === 500) {
-				socket.emit("room full");
-				return;
+			if (userIndex !== -1) {
+				// User already exists in the room, update their information
+				groupRoom[roomID][userIndex] = {
+					socketId,
+					userName,
+					userImg,
+					isHost,
+				};
+			} else {
+				// User does not exist in the room, add them
+				const length = groupRoom[roomID].length;
+				if (length === 500) {
+					socket.emit("room full");
+					return;
+				}
+				groupRoom[roomID].push({ socketId, userName, userImg, isHost });
 			}
-			users[roomID].push({ socketId, userName, userImg, isHost });
 		} else {
-			users[roomID] = [{ socketId, userName, userImg, isHost }];
+			groupRoom[roomID] = [{ socketId, userName, userImg, isHost }];
 		}
 
-		// returning new room with all the attendees after new attendee joined
-		socketToRoom[socketId] = roomID;
-        // console.log(socketToRoom[socketId]);
-		const usersInThisRoom = users[roomID].filter(
-			(user) => user.id !== socketId,
+		// Update socketToRoom mapping
+		socketToRoom[socketId] = roomID
+
+		// Get all users in the room except the current user
+		const usersInRoom = groupRoom[roomID].filter(
+			(user) => user.socketId !== socketId,
 		);
-		socket.emit("all users", usersInThisRoom);
-        // console.log(usersInThisRoom);
+		// Emit the "all users" event to the current socket
+		socket.emit("all users", usersInRoom);
 	});
 
 	// sending signal to existing members when user join
@@ -121,8 +136,8 @@ io.on("connection", (socket) => {
 	// handling user disconnect in group call
 	socket.on("disconnect", () => {
 		// remove user form room if disconnect
-		for (const roomID in rooms) {
-			const room = rooms[roomID];
+		for (const roomID in singleRoom) {
+			const room = singleRoom[roomID];
 			const index = room.findIndex((user) => user.id === socketId);
 			if (index !== -1) {
 				room.splice(index, 1);
@@ -135,23 +150,29 @@ io.on("connection", (socket) => {
 		}
 
 		// Remove the user from the group room upon disconnection
-	// 	const groupRoomID = socketToRoom[socketId];
-	// 	if (users[groupRoomID]) {
-	// 		users[groupRoomID] = users[groupRoomID].filter(
-	// 			(user) => user.id !== socketId,
-	// 		);
-	// 		// Broadcast the updated user list to all users in the room
-	// 		const updatedUsersInThisRoom = users[groupRoomID].filter(
-	// 			(user) => user.id !== socketId,
-	// 		);
-	// 		socket.broadcast
-	// 			.to(groupRoomID)
-	// 			.emit("all users", updatedUsersInThisRoom);
-	// 	}
-	// 	// Remove the socket from the socketToRoom mapping
-	// 	delete socketToRoom[socketId];
-	// 	socket.emit("user left group", socketId);
+		// Check if the user is associated with a room
+		if (socketToRoom[socketId]) {
+			const disconnectedRoomID = socketToRoom[socketId];
 
+			// Remove the user from the corresponding room in groupRoom
+			if (groupRoom[disconnectedRoomID]) {
+				groupRoom[disconnectedRoomID] = groupRoom[disconnectedRoomID].filter(
+					(user) => user.socketId !== socketId,
+				);
+				// Emit the "all users" event to the remaining users in the room
+				// Check if the room is empty after removing the user
+				if (groupRoom[disconnectedRoomID].length === 0) {
+					// Room is empty, delete the room from groupRoom
+					delete groupRoom[disconnectedRoomID];
+				} else {
+					// Emit the "all users" event to the remaining users in the room
+					socket.broadcast
+						.to(disconnectedRoomID)
+						.emit("all users", groupRoom[disconnectedRoomID]);
+				}
+			}
+		}
+		
 		// emiting a signal and sending it to everyone that a user left
 		socket.broadcast.emit("user left live", socketId);
 	});

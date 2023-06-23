@@ -28,8 +28,8 @@ const ParticipantSlide = ({ peers, Video }) => {
 			>
 				{peers.map((peer) => {
 					return (
-						<SwiperSlide>
-							<Video class="groupVideo" key={peer.peerID} peer={peer.peer} />
+						<SwiperSlide key={peer.peerID}>
+							<Video class="groupVideo" peer={peer.peer} />
 							<i className="fal fa-microphone font-bold text-md text-gray-200 bg-green-400 p-1 absolute bottom-4 right-4 rounded-md"></i>
 						</SwiperSlide>
 					);

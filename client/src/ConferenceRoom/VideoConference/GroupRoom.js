@@ -14,9 +14,11 @@ import useRoom from "../../hooks/useRoom";
 const Video = (props) => {
 	const ref = useRef();
 	useEffect(() => {
-		props.peer.on("stream", (stream) => {
-			ref.current.srcObject = stream;
-		});
+		if (ref?.current) {
+			props.peer.on("stream", (stream) => {
+				ref.current.srcObject = stream;
+			});
+		}
 	}, [props.peer]);
 
 	return <video className="groupVideo" playsInline autoPlay ref={ref} />;
@@ -49,6 +51,7 @@ const GroupRoom = () => {
 
 	// get all user if not hosted
 	const peerUsers = peers.filter(user=>user.isHost === false)
+	const uniqPeerUsers = Array.from( new Set(peerUsers))
 	// find hosted user
 	const hostUser = peers.find(user=>user.isHost === true)
 	// creating a peer object for newly joined user
@@ -192,7 +195,7 @@ const GroupRoom = () => {
 	useEffect(() => {
 		// grabbing the room id from the url and then sending it to the socket io server
 		// socketRef.current = io.connect("https://meetroom.onrender.com");
-		socketRef.current = io.connect("http://localhost:8000");
+		socketRef.current = io.connect("https://meetroom.onrender.com");
 
 		// ==========Asking for audio and video access============
 		navigator.mediaDevices
@@ -390,7 +393,7 @@ const GroupRoom = () => {
                     </div>
                 </div> */}
 				<div className="py-2">
-					<ParticipantSlide peers={peerUsers} Video={Video} />
+					<ParticipantSlide peers={uniqPeerUsers} Video={Video} />
 				</div>
 			</div>
 
