@@ -185,10 +185,10 @@ const SingleRoom = () => {
 	);
 
 	// function to handle the answer which the user a (who created the call) is receiving
-	const handleAnswer = (message) => {
+	const handleAnswer = useCallback( (message) => {
 		const desc = new RTCSessionDescription(message.sdp);
 		peerRef.current.setRemoteDescription(desc).catch((e) => console.log(e));
-	};
+	},[]);
 
 	// ======== END OF THE PEER TO PEER CONNECTION ===============
 
@@ -215,6 +215,7 @@ const SingleRoom = () => {
 	};
 
 	useEffect(() => {
+		if(user){
 		// grabbing the room id from the url and then sending it to the socket io server
 		socketRef.current = io.connect("https://meetroom.onrender.com");
 		// ==========Asking for audio and video access============
@@ -258,7 +259,8 @@ const SingleRoom = () => {
 				socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
 			});
 		// setHeight(containerVideo.current.clientWidth - 500);
-	}, [user, callUser, handleRecieveCall, userName, roomID, userImg]);
+		}
+	}, [user, callUser, handleRecieveCall, handleAnswer, userName, roomID, userImg]);
 
 	// Toggle Video
 	let isVideo = true;
