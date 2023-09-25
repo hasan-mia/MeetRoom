@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useParams } from "react-router-dom";
@@ -14,253 +15,313 @@ const SingleRoom = () => {
 			? user.photoURL
 			: `https://img.icons8.com/?size=512&id=108296&format=png`;
 	const userName = user?.displayName;
-	const { roomID } = useParams();
-	// variables for different functionalities of video call
-	const containerVideo = useRef()
-	const userVideo = useRef();
-	const partnerVideo = useRef();
-	const peerRef = useRef();
-	const socketRef = useRef();
-	const usersID = useRef();
-	const yourNameRef = useRef();
-	const yourImageRef = useRef();
-	const userNameRef = useRef();
-	const userImageRef = useRef();
-	const userStream = useRef();
-	const senders = useRef([]);
-	const sendChannel = useRef();
-	const [text, setText] = useState("");
-	const [messages, setMessages] = useState([]);
-	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-	const [showChat, setShowChat] = useState(false);
+const { roomID } = useParams();
+    // variables for different functionalities of video call
+    const containerVideo = useRef();
+    const userVideo = useRef();
+    const partnerVideo = useRef();
+    const peerRef = useRef();
+    const socketRef = useRef();
+    const usersID = useRef();
+    const yourNameRef = useRef();
+    const yourImageRef = useRef();
+    const userNameRef = useRef();
+    const userImageRef = useRef();
+    const userStream = useRef();
+    const senders = useRef([]);
+    const sendChannel = useRef();
+    const [text, setText] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+    const [showChat, setShowChat] = useState(false);
+    const [iceServer, setIceServer] = useState([
+        { urls: 'stun:stun.relay.metered.ca:80' },
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' },
+        { urls: 'stun:stun4.l.google.com:19302' },
+        { urls: 'stun:openrelay.metered.ca:80' },
+        {
+            urls: 'turn:a.relay.metered.ca:80',
+            username: 'bab9ca25580d0235617aea7e',
+            credential: 'NVk1oJx3ogplGTuj',
+        },
+        {
+            urls: 'turn:a.relay.metered.ca:80?transport=tcp',
+            username: 'bab9ca25580d0235617aea7e',
+            credential: 'NVk1oJx3ogplGTuj',
+        },
+        {
+            urls: 'turn:a.relay.metered.ca:443',
+            username: 'bab9ca25580d0235617aea7e',
+            credential: 'NVk1oJx3ogplGTuj',
+        },
+        {
+            urls: 'turn:a.relay.metered.ca:443?transport=tcp',
+            username: 'bab9ca25580d0235617aea7e',
+            credential: 'NVk1oJx3ogplGTuj',
+        },
+        {
+            urls: 'turn:openrelay.metered.ca:80',
+            username: 'openrelayproject',
+            credential: 'openrelayproject',
+        },
+        {
+            urls: 'turn:openrelay.metered.ca:443',
+            username: 'openrelayproject',
+            credential: 'openrelayproject',
+        },
+        {
+            urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+            username: 'openrelayproject',
+            credential: 'openrelayproject',
+        },
+    ]);
+    // ======== END OF THE PEER TO PEER CONNECTION ===============
 
-	// user id of the person we are trying to call ( user b )
-	// user b recieving the offer
-	const createPeer = useCallback((userID) => {
-		const peer = new RTCPeerConnection({
-			// connecting the two servers
-			iceServers: [
-				{ urls: "stun:stun.relay.metered.ca:80"},
-				{ urls: "stun:stun.l.google.com:19302" },
-				{ urls: "stun:stun1.l.google.com:19302" },
-				{ urls: "stun:stun2.l.google.com:19302" },
-				{ urls: "stun:stun3.l.google.com:19302" },
-				{ urls: "stun:stun4.l.google.com:19302" },
-				{ urls: "stun:openrelay.metered.ca:80" },
-				{
-					urls: "turn:a.relay.metered.ca:80",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:a.relay.metered.ca:80?transport=tcp",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:a.relay.metered.ca:443",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:a.relay.metered.ca:443?transport=tcp",
-					username: "bab9ca25580d0235617aea7e",
-					credential: "NVk1oJx3ogplGTuj",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:80",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:443",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-				{
-					urls: "turn:openrelay.metered.ca:443?transport=tcp",
-					username: "openrelayproject",
-					credential: "openrelayproject",
-				},
-			],
-		});
+    // handling the ice candidates
+    const handleICECandidateEvent = (e) => {
+        if (e.candidate) {
+            const payload = {
+                target: usersID.current,
+                candidate: e.candidate,
+            };
+            socketRef.current.emit('ice-candidate', payload);
+        }
+    };
 
-		peer.onicecandidate = handleICECandidateEvent;
-		peer.ontrack = handleTrackEvent;
-		peer.onnegotiationneeded = () => handleNegotiationNeededEvent(userID);
+    // receiving the remote stream of peer and attaching the video of partner
+    const handleTrackEvent = (e) => {
+        partnerVideo.current.srcObject = e.streams[0];
+    };
 
-		return peer;
-	}, []);
+    // ================== CREATING THE PEER TO PEER CONNECTION ==========
 
-	// calling user a ( who created the room )
-	const callUser = useCallback(
-		(userID) => {
-			// taking the peer ID
-			peerRef.current = createPeer(userID);
+    // making the call
+    // when the actual offer is created, it is then sent to the other user
+    const handleNegotiationNeededEvent = (userID) => {
+        peerRef.current
+            .createOffer()
+            .then((offer) =>
+                // setting the local description from the users offer
+                peerRef.current.setLocalDescription(offer)
+            )
+            .then(() => {
+                // the person we are trying to make the offer to
+                const payload = {
+                    target: userID,
+                    caller: socketRef.current.id,
+                    sdp: peerRef.current.localDescription,
+                };
+                socketRef.current.emit('offer', payload);
+            })
+            .catch((e) => console.log(e));
+    };
 
-			// streaming the user a stream
-			// giving access to our peer of our individual stream
-			// storing all the objects sent by the user into the senders array
-			userStream.current
-				.getTracks()
-				.forEach((track) =>
-					senders.current.push(
-						peerRef.current.addTrack(track, userStream.current),
-					),
-				);
+    // user id of the person we are trying to call ( user b )
+    // user b recieving the offer
+    const createPeer = useCallback(
+        (userID) => {
+            const peer = new RTCPeerConnection({
+                // connecting the two servers
+                iceServers: iceServer,
+            });
 
-			// creating a data channel for chatting
-			sendChannel.current = peerRef.current.createDataChannel("sendChannel");
-			sendChannel.current.onmessage = handleReceiveMessage;
-		},
-		[createPeer],
-	);
+            peer.onicecandidate = handleICECandidateEvent;
+            peer.ontrack = handleTrackEvent;
+            peer.onnegotiationneeded = () => handleNegotiationNeededEvent(userID);
 
-	// ================== CREATING THE PEER TO PEER CONNECTION ==========
+            return peer;
+        },
+        [iceServer]
+    );
 
-	// making the call
-	// when the actual offer is created, it is then sent to the other user
-	const handleNegotiationNeededEvent = (userID) => {
-		peerRef.current
-			.createOffer()
-			.then((offer) => {
-				// setting the local description from the users offer
-				return peerRef.current.setLocalDescription(offer);
-			})
-			.then(() => {
-				// the person we are trying to make the offer to
-				const payload = {
-					target: userID,
-					caller: socketRef.current.id,
-					sdp: peerRef.current.localDescription,
-				};
-				socketRef.current.emit("offer", payload);
-			})
-			.catch((e) => console.log(e));
-	};
+    // Handle received message
+    const handleReceiveMessage = (event) => {
+        const data = JSON.parse(event.data);
+        const receivedMessage = {
+            yours: false,
+            data: {
+                name: data.name,
+                image: data.image,
+                message: data.message,
+            },
+        };
 
-	// recieving the call
-	const handleRecieveCall = useCallback(
-		(incoming) => {
-			peerRef.current = createPeer();
+        setMessages((msg) => [...msg, receivedMessage]);
+    };
 
-			// chatting
-			peerRef.current.ondatachannel = (event) => {
-				sendChannel.current = event.channel;
-				sendChannel.current.onmessage = handleReceiveMessage;
-			};
+    // recieving the call
+    const handleRecieveCall = useCallback(
+        (incoming) => {
+            peerRef.current = createPeer();
 
-			// remote description
-			const desc = new RTCSessionDescription(incoming.sdp);
+            // chatting
+            peerRef.current.ondatachannel = (event) => {
+                sendChannel.current = event.channel;
+                sendChannel.current.onmessage = handleReceiveMessage;
+            };
 
-			// setting remote description and attaching the stream
-			peerRef.current
-				.setRemoteDescription(desc)
-				.then(() => {
-					userStream.current
-						.getTracks()
-						.forEach((track) =>
-							peerRef.current.addTrack(track, userStream.current),
-						);
-				})
-				.then(() => {
-					// creating the answer
-					return peerRef.current.createAnswer();
-				})
-				.then((answer) => {
-					// setting local description
-					return peerRef.current.setLocalDescription(answer);
-				})
-				.then(() => {
-					// sending data back to the caller
-					const payload = {
-						target: incoming.caller,
-						caller: socketRef.current.id,
-						sdp: peerRef.current.localDescription,
-					};
-					socketRef.current.emit("answer", payload);
-				});
-		},
-		[createPeer],
-	);
+            // remote description
+            const desc = new RTCSessionDescription(incoming.sdp);
 
-	// function to handle the answer which the user a (who created the call) is receiving
-	const handleAnswer = useCallback( (message) => {
-		const desc = new RTCSessionDescription(message.sdp);
-		peerRef.current.setRemoteDescription(desc).catch((e) => console.log(e));
-	},[]);
+            // setting remote description and attaching the stream
+            peerRef.current
+                .setRemoteDescription(desc)
+                .then(() => {
+                    userStream.current
+                        .getTracks()
+                        .forEach((track) => peerRef.current.addTrack(track, userStream.current));
+                })
+                .then(() =>
+                    // creating the answer
+                    peerRef.current.createAnswer()
+                )
+                .then((answer) =>
+                    // setting local description
+                    peerRef.current.setLocalDescription(answer)
+                )
+                .then(() => {
+                    // sending data back to the caller
+                    const payload = {
+                        target: incoming.caller,
+                        caller: socketRef.current.id,
+                        sdp: peerRef.current.localDescription,
+                    };
+                    socketRef.current.emit('answer', payload);
+                });
+        },
+        [createPeer]
+    );
 
-	// ======== END OF THE PEER TO PEER CONNECTION ===============
+    // calling user a ( who created the room )
+    const callUser = useCallback(
+        (userID) => {
+            // taking the peer ID
+            peerRef.current = createPeer(userID);
 
-	// handling the ice candidates
-	const handleICECandidateEvent = (e) => {
-		if (e.candidate) {
-			const payload = {
-				target: usersID.current,
-				candidate: e.candidate,
-			};
-			socketRef.current.emit("ice-candidate", payload);
-		}
-	};
+            // streaming the user a stream
+            // giving access to our peer of our individual stream
+            // storing all the objects sent by the user into the senders array
+            userStream.current
+                .getTracks()
+                .forEach((track) =>
+                    senders.current.push(peerRef.current.addTrack(track, userStream.current))
+                );
 
-	// swapping candidates until they reach on an agreement
-	const handleNewICECandidateMsg = (incoming) => {
-		const candidate = new RTCIceCandidate(incoming);
-		peerRef.current.addIceCandidate(candidate).catch((e) => console.log(e));
-	};
+            // creating a data channel for chatting
+            sendChannel.current = peerRef.current.createDataChannel('sendChannel');
+            sendChannel.current.onmessage = handleReceiveMessage;
+        },
+        [createPeer]
+    );
 
-	// receiving the remote stream of peer and attaching the video of partner
-	const handleTrackEvent = (e) => {
-		partnerVideo.current.srcObject = e.streams[0];
-	};
+    // function to handle the answer which the user a (who created the call) is receiving
+    const handleAnswer = useCallback((message) => {
+        const desc = new RTCSessionDescription(message.sdp);
+        peerRef.current.setRemoteDescription(desc).catch((e) => console.log(e));
+    }, []);
 
-	useEffect(() => {
-		if(user){
-		// grabbing the room id from the url and then sending it to the socket io server
-		socketRef.current = io.connect("https://meetroom.onrender.com");
-		// ==========Asking for audio and video access============
-		navigator.mediaDevices
-			.getUserMedia({ audio: true, video: true })
-			.then((stream) => {
-				// streaming the audio and video and storing the local stream
-				userVideo.current.srcObject = stream;
-				userStream.current = stream;
+    // swapping candidates until they reach on an agreement
+    const handleNewICECandidateMsg = (incoming) => {
+        const candidate = new RTCIceCandidate(incoming);
+        peerRef.current.addIceCandidate(candidate).catch((e) => console.log(e));
+    };
 
-				document.getElementById("btn-chat").classList =
-					"fab fa-rocketchat font-bold";
+    // ==========Function to handle getUserMedia access============
+    // Options for getUserMedia
+    const [constraints, setConstraints] = useState({ audio: true, video: true });
+    const startCamera = useCallback(async () => {
+        try {
+            await navigator.mediaDevices
+                .getUserMedia(constraints)
+                .then((stream) => {
+                    // streaming the audio and video and storing the local stream
+                    userVideo.current.srcObject = stream;
+                    userStream.current = stream;
 
-				socketRef.current.emit("join room", {
-					roomID,
-					userName,
-					userImg,
-				});
-				// user a is joining
-				socketRef.current.on("old user", ({ userId, userName, userImg }) => {
-					callUser(userId);
-					usersID.current = userId;
-					yourNameRef.current = userName;
-					yourImageRef.current = userImg;
-				});
+                    document.getElementById('btn-chat').classList = 'fab fa-rocketchat fw-semibold';
 
-				// user b is joining
-				socketRef.current.on("new user", ({ newUserId, userName, userImg }) => {
-					usersID.current = newUserId;
-					userNameRef.current = userName;
-					userImageRef.current = userImg;
-				});
+                    socketRef.current.emit('join room', {
+                        roomID,
+                        userName,
+                        userImg,
+                    });
+                    // user a is joining
+                    socketRef.current.on('old user', ({ userId, userName: name, userImg: img }) => {
+                        callUser(userId);
+                        usersID.current = userId;
+                        yourNameRef.current = name;
+                        yourImageRef.current = img;
+                    });
 
-				// calling the function when made an offer
-				socketRef.current.on("offer", handleRecieveCall);
+                    // user b is joining
+                    socketRef.current.on(
+                        'new user',
+                        ({ newUserId, userName: name, userImg: img }) => {
+                            usersID.current = newUserId;
+                            userNameRef.current = name;
+                            userImageRef.current = img;
+                        }
+                    );
 
-				// sending the answer back to socket
-				socketRef.current.on("answer", handleAnswer);
+                    // calling the function when made an offer
+                    socketRef.current.on('offer', handleRecieveCall);
 
-				// joining the user after receiving offer
-				socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
-			});
-		// setHeight(containerVideo.current.clientWidth - 500);
-		}
-	}, [user, callUser, handleRecieveCall, handleAnswer, userName, roomID, userImg]);
+                    // sending the answer back to socket
+                    socketRef.current.on('answer', handleAnswer);
+
+                    // joining the user after receiving offer
+                    socketRef.current.on('ice-candidate', handleNewICECandidateMsg);
+                })
+                .catch((error) => {
+                    if (error.name === 'NotAllowedError') {
+                        toast.error('Camera and microphone access denied by the user.');
+                    } else if (error.name === 'NotFoundError') {
+                        toast.error('No camera or microphone found on this device.');
+                    } else {
+                        toast.error('Failed accessing camera/microphone.');
+                    }
+                    console.error(error);
+                });
+        } catch (error) {
+            toast.error('MediaDevices is not supported.');
+            console.log(error);
+        }
+    }, [callUser, handleRecieveCall, handleAnswer, constraints, userName, roomID, userImg]);
+
+    // let isCamera = true;
+    // let iconCamera = 'fas fa-camera-retro fw-semibold';
+    // // Function to flip the camera
+    // const flipCamera = () => {
+    //     document.getElementById('btn-cam').classList = iconCamera;
+    //     if (isCamera) {
+    //         iconCamera = 'fal fa-camera fw-semibold';
+    //     } else {
+    //         iconCamera = 'fas fa-camera-retro fw-semibold';
+    //     }
+    //     isCamera = !isCamera;
+    //     const currentStream = userVideo.current.srcObject;
+    //     const tracks = currentStream.getTracks();
+    //     // Stop the current camera stream
+    //     tracks.forEach((track) => track.stop());
+    //     // Toggle the constraint to switch between front and rear camera
+    //     constraints.video = !constraints.video;
+
+    //     // Restart the camera with the new constraint
+    //     startCamera();
+    // };
+
+    // grabbing the room id from the url and then sending it to the socket io server
+    useEffect(() => {
+        if (user) {
+            socketRef.current = io.connect('https://meetroom.onrender.com');
+            // socketRef.current = io.connect('http://localhost:8000');
+            // ==========Asking for audio and video access============
+            startCamera();
+        }
+    }, [user, startCamera]);
 
 	// Toggle Video
 	let isVideo = true;
@@ -413,22 +474,6 @@ const SingleRoom = () => {
 			},
 		]);
 		setText("");
-	};
-
-	// Handle received message
-	const handleReceiveMessage = (event) => {
-		const data = JSON.parse(event.data);
-
-		const receivedMessage = {
-			yours: false,
-			data: {
-				name: data.name,
-				image: data.image,
-				message: data.message,
-			},
-		};
-
-		setMessages((messages) => [...messages, receivedMessage]);
 	};
 
 	// differentiating messages from user a and user b
