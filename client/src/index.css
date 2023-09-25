@@ -113,7 +113,7 @@
 /* override other styles to make responsive */
 
 .chat-h {
-	max-height: 73vh;
+	max-height: 70vh;
 	height: 100vh;
 }
 .oneVideo {
@@ -127,7 +127,7 @@
 	width: 15vw !important;
 	top: 3%;
 	left: 2%;
-	border: 2px solid green;
+	border: 1px solid green;
 	z-index: 1;
 }
 

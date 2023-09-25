@@ -3,7 +3,6 @@ import "react-calendar/dist/Calendar.css";
 import Clock from "react-clock";
 import "react-clock/dist/Clock.css";
 import { Link } from "react-router-dom";
-import CreateBroadcastRoom from "../../ConferenceRoom/ModalConference/CreateBroadcastRoom";
 import CreateChatRoom from "../../ConferenceRoom/ModalConference/CreateChatRoom";
 import CreateGroupRoom from "../../ConferenceRoom/ModalConference/CreateGroupRoom";
 import CreateSingleRoom from "../../ConferenceRoom/ModalConference/CreateSingleRoom";
@@ -26,7 +25,7 @@ const RoomHome = () => {
 		<div className="w-full mx-auto cursor-pointer">
 			<div className="flex flex-col lg:flex-row gap-2">
 				<div
-					className="card w-12/12 lg:w-8/12 bg-base-100"
+					className="card w-12/12 lg:w-12/12 bg-base-100"
 					style={{
 						backgroundImage: `url(${WatchBg})`,
 						backgroundSize: "cover",
@@ -40,35 +39,20 @@ const RoomHome = () => {
 						</div>
 					</div>
 				</div>
-
-				{/* ======Single Video Calling===== */}
-				<div className="card w-12/12 lg:w-4/12 bg-primary text-primary-content">
-					<button type="button" className="card-body">
-						<div className="flex justify-start gap-1">
-							<CreateSingleRoom />
-						</div>
-						<h2 className="text-xl font-semibold">Single call</h2>
-						<p className="text-sm">Start Calling</p>
-					</button>
-				</div>
 			</div>
 
 			<div className="flex flex-col lg:flex-row gap-2 py-2">
+				{/* ======Single Video Calling===== */}
+				<div className="card w-12/12 lg:w-4/12 bg-primary text-primary-content">
+					<CreateSingleRoom />
+				</div>
 				{/* ======Group Video Calling===== */}
-				<div className="card w-12/12 lg:w-6/12 bg-fuchsia-800 text-primary-content ml-0">
-					<div className="card-body">
-						<div className="flex justify-start gap-1">
-							<button>
-								<CreateGroupRoom />
-							</button>
-						</div>
-						<h2 className="text-lg font-semibold">Group Call</h2>
-						<p className="text-sm">Start Group Calling</p>
-					</div>
+				<div className="card w-12/12 lg:w-4/12 bg-fuchsia-800 text-primary-content ml-0">
+					<CreateGroupRoom />
 				</div>
 
 				{/* ======Chatting Option===== */}
-				<div className="card w-12/12 lg:w-6/12 bg-pink-700 text-primary-content ml-0">
+				<div className="card w-12/12 lg:w-4/12 bg-pink-700 text-primary-content ml-0">
 					<div className="card-body">
 						<div className="flex justify-start gap-1">
 							<button>
@@ -82,7 +66,7 @@ const RoomHome = () => {
 					</div>
 				</div>
 
-				{/* ======Live BroadCast===== */}
+				{/* ======Live BroadCast=====
 				<div className="card w-12/12 lg:w-6/12 bg-sky-600 text-primary-content ml-0">
 					<div className="card-body">
 						<div className="flex justify-start gap-1">
@@ -96,7 +80,7 @@ const RoomHome = () => {
 					</div>
 				</div>
 
-				{/* ======Schedule Option===== */}
+				======Schedule Option=====
 				<div className="card w-12/12 lg:w-6/12 bg-cyan-700 text-primary-content ml-0">
 					<div className="card-body">
 						<div className="card-actions justify-start">
@@ -109,7 +93,7 @@ const RoomHome = () => {
 						</Link>
 						<p className="text-sm">plan your meeting</p>
 					</div>
-				</div>
+				</div> */}
 			</div>
 		</div>
 	);

@@ -316,9 +316,8 @@ const { roomID } = useParams();
     // grabbing the room id from the url and then sending it to the socket io server
     useEffect(() => {
         if (user) {
-            socketRef.current = io.connect('https://meetroom.onrender.com');
-            // socketRef.current = io.connect('http://localhost:8000');
-            // ==========Asking for audio and video access============
+            // socketRef.current = io.connect('https://meetroom.onrender.com');
+            socketRef.current = io.connect('http://localhost:8000');
             startCamera();
         }
     }, [user, startCamera]);
@@ -488,7 +487,7 @@ const { roomID } = useParams();
 						<div className="flex justify-end items-center mb-1">
 							<p className="text-sm text-white p-1 rounded font-semibold">
 								{message?.data?.name || "You"}
-							</p>
+s							</p>
 							<img
 								src={message?.data?.image}
 								alt={message?.data?.name}
@@ -536,8 +535,8 @@ const { roomID } = useParams();
 			<div
 				className={
 					showChat
-						? `md:w-12/12  lg:w-7/12 relative`
-						: `md:w-12/12 lg:w-7/12 relative`
+						? `md:w-12/12  lg:w-8/12 relative`
+						: `md:w-12/12 lg:w-8/12 relative`
 				}
 			>
 				<SingleVideo

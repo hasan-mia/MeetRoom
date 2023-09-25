@@ -1,95 +1,32 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from 'react';
 import { AiOutlinePushpin } from "react-icons/ai";
-import { BsRecordCircle } from "react-icons/bs";
+import { BsPlus, BsRecordCircle } from "react-icons/bs";
 import { FaCreativeCommons } from "react-icons/fa";
+import { IoPeopleOutline } from "react-icons/io5";
 
 const GroupVideo = ({
 	userVideo,
 	hostUser,
-	getUrl,
+    getUrl,
 	copySuccess,
 	hangUp,
 	toggleAudio,
 	toggleVideo,
 	shareScreen,
 	stopShare,
-	socketRef,
 }) => {
-	const [isRecording, setIsRecording] = useState(false);
-	const [elapsedTime, setElapsedTime] = useState(0);
-	const mediaRecorderRef = useRef(null);
-	// hanle start recording
-	const handleStartRecording = () => {
-		const stream = userVideo.current.captureStream();
-		const chunks = [];
-
-		mediaRecorderRef.current = new MediaRecorder(stream);
-		mediaRecorderRef.current.ondataavailable = (event) => {
-			chunks.push(event.data);
-		};
-
-		mediaRecorderRef.current.onstop = () => {
-			const recordedBlob = new Blob(chunks, { type: "video/webm" });
-			// Send the recordedBlob to the server
-			socketRef?.current?.emit("recorded-video", recordedBlob);
-			chunks.length = 0;
-		};
-
-		mediaRecorderRef.current.start();
-		setIsRecording(true);
-	};
-	// hanle stop recording
-	const handleStopRecording = () => {
-		if (
-			mediaRecorderRef.current &&
-			mediaRecorderRef.current.state !== "inactive"
-		) {
-			mediaRecorderRef.current.stop();
-			setIsRecording(false);
-		}
-	};
-	useEffect(() => {
-		let timerId;
-		if (isRecording) {
-			timerId = setInterval(() => {
-				setElapsedTime((prevElapsedTime) => prevElapsedTime + 1);
-			}, 1000);
-		}
-		return () => {
-			clearInterval(timerId);
-		};
-	}, [isRecording]);
+    console.log(hostUser);
 	return (
 		<div className="w-full mx-auto">
-			<div className="text-gray-200 flex justify-between">
-				<div className="flex list-none items-center">
-					<li className="bg-red-500 rounded-full">
-						<BsRecordCircle />
-					</li>
-					<li className="text-sm lg:text-md px-1 lg:px-2">
-						REQ : {elapsedTime} s
-					</li>
-				</div>
-				<div className="flex items-center">
-					{isRecording ? (
-						<button
-							type="button"
-							className="flex items-center gap-2 uppercase text-sm"
-							onClick={handleStopRecording}
-						>
-							<BsRecordCircle size={20} className="text-red-500" />
-							Stop req
-						</button>
-					) : (
-						<button
-							type="button"
-							className="flex items-center gap-2 uppercase text-sm"
-							onClick={handleStartRecording}
-						>
-							<BsRecordCircle size={20} className="text-green-500" />
-							Star req
-						</button>
-					)}
+			<div className="flex items-center justify-between text-gray-200">
+				<div className="flex gap-0 lg:gap-1">
+					{/* <h2 className='text-sm lg:text-xl text-gray-200'>Now: </h2> */}
+					<div className="flex items-center rounded bg-green-900 list-none">
+						<li className="px-2 text-lg text-semibold">
+							<IoPeopleOutline />
+						</li>
+						<li className="pr-1 text-md">4+ </li>
+					</div>
 				</div>
 				<div
 					className="tooltip mr-1 py-1 px-2 rounded text-white hover:bg-slate-700"
@@ -97,17 +34,32 @@ const GroupVideo = ({
 				>
 					<button
 						type="button"
-						className="text-gray-300 uppercase"
+						className="text-gray-300"
 						onClick={() => {
 							getUrl();
 						}}
 					>
-						<small>Share Link</small>
+						<small>Copy Link</small>
 					</button>
 				</div>
 			</div>
+			<div className="text-gray-200 flex justify-between my-2">
+				<div className="flex list-none items-center">
+					<li className="bg-red-500 rounded-full">
+						<BsRecordCircle />
+					</li>
+					<li className="text-sm lg:text-md px-1 lg:px-2">REQ : 00.02.36s </li>
+				</div>
 
-			<div className="rounded-xl border border-green-500 relative gap-2 mt-2 h-fit">
+				<div className="flex list-none items-center text-gray-200">
+					<li className="bg-green-900 rounded-full cursor-pointer">
+						<BsPlus />
+					</li>
+					<li className="text-sm lg:text-md px-2">Add user to the class</li>
+				</div>
+			</div>
+
+			<div className="rounded-xl bg-green-600 relative w-full">
 				<div className="text-gray-200 list-none text-xl flex gap-3 justify-start p-4 absolute">
 					<li className="bg-green-400 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 rounded-xl p-1 ">
 						<FaCreativeCommons />
@@ -118,7 +70,7 @@ const GroupVideo = ({
 				</div>
 
 				{/* =======Video Player======= */}
-				<div className="grid grid-cols-1 justify-center items-center rounded-xl relative">
+				<div className="grid grid-cols-1 rounded-xl gap-2 p-2">
 					<video
 						className="group-one"
 						muted

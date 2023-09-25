@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { v1 as uuid } from "uuid";
 import useRoom from '../../hooks/useRoom';
 
@@ -118,29 +118,15 @@ const CreateGroupRoom = () => {
     // const [modalShow, setModalShow] = React.useState(false);
 
     return (
-        <div className=' items-center justify-center'>
-            <label htmlFor="my-modal-2" className="hover:cursor-pointer"><i className="fas fa-video-plus font-bold text-3xl bg-clock bg-transparent border border-gray-300 p-2"></i></label>
-
-            <input type="checkbox" id="my-modal-2" className="modal-toggle" />
-            
-            <div className="modal modal-bottom sm:modal-middle">
-                <div className="modal-box bg-chat h-auto">
-                    <h2 className="text-center text-3xl divide-y font-semibold">Group Video Meeting</h2>
-                    <div className='flex justify-center gap-3'>
-                        {/* Cancel Btn */}
-                        <div className="modal-action">
-                            <label htmlFor="my-modal-2" className="btn">Cancel</label>
-                            <div className="flex gap-2 items-center">
-                            {/* <button  type="button" className="schedule" onClick={() => setModalShow(true)}> Schedule Call </button> */}
-                            <Link to="/conference/schedule" className="btn">Schedule</Link>
-                            <button  type="button" className="btn" onClick={()=>create()}> Start meet </button>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
+        <div className=" items-center justify-center">
+				<button type="button" className="card-body" onClick={() => create()}>
+					<div className="flex justify-start gap-1">
+						<i className="fas fa-video-plus font-bold text-3xl"></i>
+					</div>
+					<h2 className="text-xl font-semibold">Group Call</h2>
+					<p className="text-sm">Start group call</p>
+				</button>
+			</div>
     );
 };
 

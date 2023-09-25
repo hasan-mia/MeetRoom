@@ -29,17 +29,17 @@ const LeftNavbar = () => {
 						<i className="fal fa-home text-gray-200 text-lg lg:text-3xl hover:text-green-400 hover:translate-x-0.5 transition-transform active:text-green-500"></i>
 					</Link>
 				</li>
-				<li>
+				{/* <li>
 					<Link to={`/conference/live`}>
 						<i className="fal fa-video text-gray-200 text-lg lg:text-3xl hover:text-green-400 hover:translate-x-0.5 transition-transform"></i>
 					</Link>
-				</li>
+				</li> */}
 				{/* <li><Link to="/conference/users"><i className="fal fa-users text-gray-200 text-lg lg:text-3xl hover:text-green-400 hover:translate-x-0.5 transition-transform focus:text-green-500"></i></Link></li> */}
-				<li>
+				{/* <li>
 					<Link to="/conference/schedule">
 						<i className="fas fa-calendar-alt text-gray-200 text-lg lg:text-3xl hover:text-green-400 hover:translate-x-0.5 transition-transform"></i>
 					</Link>
-				</li>
+				</li> */}
 				<li>
 					<Link to="/conference/notifications">
 						<i className="fal fa-bell text-gray-200 text-lg lg:text-3xl hover:text-green-400 hover:translate-x-0.5 transition-transform"></i>

@@ -27,7 +27,7 @@ const SignleChat = ({
 	}, [messages]);
 
 	return (
-		<div className="lg:w-full bg-black lg:bg-transparent border-x border-b border-green-700 relative">
+		<div className="lg:w-full bg-black lg:bg-transparent border-x border-b border-green-700 rounded-b-md relative">
 			<div
 				className="rounded-lg mb-2 tab-bar overflow-y-auto chat-h px-2 capitalize"
 				ref={chatRef}
@@ -36,11 +36,11 @@ const SignleChat = ({
 				{scrollToBottom()}
 			</div>
 
-			<div className="flex items-center justify-center gap-2 bg-green-600 rounded p-2 mt-1 lg:mt-6">
+			<div className="flex items-center justify-center gap-2 bg-green-600 rounded-b-md p-2 mt-1 lg:mt-6">
 				<form className="flex items-center gap-2" onSubmit={sendMessage}>
-					<button>
+					{/* <button>
 						<i className="far fa-image text-3xl text-gray-200"></i>
-					</button>
+					</button> */}
 					<input
 						type="text"
 						value={text}

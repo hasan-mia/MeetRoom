@@ -18,6 +18,7 @@ const SingleVideo = ({
 	const [isRecording, setIsRecording] = useState(false);
 	const [elapsedTime, setElapsedTime] = useState(0);
 	const mediaRecorderRef = useRef(null);
+	// hanle start recording
 	const handleStartRecording = () => {
 		const stream = userVideo.current.captureStream();
 		const chunks = [];
@@ -37,7 +38,7 @@ const SingleVideo = ({
 		mediaRecorderRef.current.start();
 		setIsRecording(true);
 	};
-
+	// hanle stop recording
 	const handleStopRecording = () => {
 		if (
 			mediaRecorderRef.current &&
@@ -49,13 +50,11 @@ const SingleVideo = ({
 	};
 	useEffect(() => {
 		let timerId;
-
 		if (isRecording) {
 			timerId = setInterval(() => {
 				setElapsedTime((prevElapsedTime) => prevElapsedTime + 1);
 			}, 1000);
 		}
-
 		return () => {
 			clearInterval(timerId);
 		};
@@ -68,7 +67,7 @@ const SingleVideo = ({
 						<BsRecordCircle />
 					</li>
 					<li className="text-sm lg:text-md px-1 lg:px-2">
-						REQ : {elapsedTime}s{" "}
+						REQ : {elapsedTime} s
 					</li>
 				</div>
 				<div className="flex items-center">
