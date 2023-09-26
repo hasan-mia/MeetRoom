@@ -24,10 +24,11 @@ const RoomHome = () => {
 	return (
 		<div className="w-full mx-auto cursor-pointer">
 			<div className="flex flex-col lg:flex-row gap-2">
+				{/* ======Single Video Calling===== */}
 				<div
-					className="card w-12/12 lg:w-12/12 bg-base-100"
+					className="card w-12/12 lg:w-8/12 bg-base-100"
 					style={{
-						backgroundImage: `url(${WatchBg})`,
+						backgroundImage:`url(${WatchBg})`,
 						backgroundSize: "cover",
 						borderRadius: "20px",
 					}}
@@ -39,20 +40,20 @@ const RoomHome = () => {
 						</div>
 					</div>
 				</div>
-			</div>
-
-			<div className="flex flex-col lg:flex-row gap-2 py-2">
 				{/* ======Single Video Calling===== */}
 				<div className="card w-12/12 lg:w-4/12 bg-primary text-primary-content">
 					<CreateSingleRoom />
 				</div>
+			</div>
+
+			<div className="flex flex-col lg:flex-row gap-2 py-2">
 				{/* ======Group Video Calling===== */}
-				<div className="card w-12/12 lg:w-4/12 bg-fuchsia-800 text-primary-content ml-0">
+				<div className="card w-12/12 lg:w-6/12 bg-fuchsia-800 text-primary-content ml-0">
 					<CreateGroupRoom />
 				</div>
 
 				{/* ======Chatting Option===== */}
-				<div className="card w-12/12 lg:w-4/12 bg-pink-700 text-primary-content ml-0">
+				<div className="card w-12/12 lg:w-6/12 bg-pink-700 text-primary-content ml-0">
 					<div className="card-body">
 						<div className="flex justify-start gap-1">
 							<button>

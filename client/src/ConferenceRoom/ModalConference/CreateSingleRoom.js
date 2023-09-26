@@ -39,13 +39,12 @@ const CreateSingleRoom = () => {
 			<div className=" items-center justify-center">
 				<button type="button" className="card-body" onClick={() => create()}>
 					<div className="flex justify-start gap-1">
-						<i className="fal fa-video font-bold text-3xl"></i>
+						<i className="fal fa-video font-bold text-3xl bg-clock bg-transparent border border-gray-300 p-2"></i>
 					</div>
 					<h2 className="text-xl font-semibold">One to One</h2>
 					<p className="text-sm">Start single call</p>
 				</button>
 			</div>
-			
 		);
 };
 

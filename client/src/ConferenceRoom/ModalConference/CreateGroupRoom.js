@@ -118,16 +118,16 @@ const CreateGroupRoom = () => {
     // const [modalShow, setModalShow] = React.useState(false);
 
     return (
-        <div className=" items-center justify-center">
+			<div className=" items-center justify-center">
 				<button type="button" className="card-body" onClick={() => create()}>
 					<div className="flex justify-start gap-1">
-						<i className="fas fa-video-plus font-bold text-3xl"></i>
+						<i className="fas fa-video-plus font-bold text-3xl bg-clock bg-transparent border border-gray-300 p-2"></i>
 					</div>
 					<h2 className="text-xl font-semibold">Group Call</h2>
 					<p className="text-sm">Start group call</p>
 				</button>
 			</div>
-    );
+		);
 };
 
 export default CreateGroupRoom;
