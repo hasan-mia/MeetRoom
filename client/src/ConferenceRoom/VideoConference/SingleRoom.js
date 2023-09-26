@@ -316,8 +316,8 @@ const { roomID } = useParams();
     // grabbing the room id from the url and then sending it to the socket io server
     useEffect(() => {
         if (user) {
-            // socketRef.current = io.connect('https://meetroom.onrender.com');
-            socketRef.current = io.connect('http://localhost:8000');
+            socketRef.current = io.connect('https://meetroom.onrender.com');
+            // socketRef.current = io.connect('http://localhost:8000');
             startCamera();
         }
     }, [user, startCamera]);
